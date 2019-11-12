@@ -1,0 +1,18 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "D:\\Programatory\\Arduino\\tools\\**",
+                "D:\\Programatory\\Arduino\\hardware\\arduino\\avr\\**",
+                "C:\\Users\\arkad\\Documents\\Arduino\\libraries",
+                "D:\\Programatory\\Arduino\\libraries"
+            ],
+            "forcedInclude": [
+                "D:\\Programatory\\Arduino\\hardware\\arduino\\avr\\cores\\arduino\\Arduino.h"
+            ],
+            "intelliSenseMode": "msvc-x64"
+        }
+    ],
+    "version": 4
+}
