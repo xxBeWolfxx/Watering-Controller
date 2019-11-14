@@ -10,7 +10,7 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 //**************************Define special function**********************************
 int KeyboardCheck();
 void LCD_swipe(int x);
-void LCD_didplay(int x);
+void LCD_display(int x);
 
 //**************************Variables********************************
 String words[5][2] = {
@@ -33,12 +33,17 @@ void setup()
     lcd.begin();
     lcd.backlight();
     lcd.clear();
-    LCD_didplay(display);
+    LCD_display(display);
+    display++;
+    delay(1000);
+    lcd.clear();
 }
 
 void loop()
 {
+    LCD_display(display);
     LCD_swipe(KeyboardCheck());
+    lcd.clear();
 }
 
 int KeyboardCheck()
@@ -58,18 +63,50 @@ void LCD_swipe(int x)
 {
     if (x == 0)
         return;
+    lcd.clear();
     switch (x)
     {
-    case 1:
+    case -1:
+    {
+        if (display == 1)
+            display = 4;
+        else
+            display--;
+    }
 
+    case 1:
+    case 2:
+    {
+        if (display == 4)
+            display = 1;
+        else
+            display++;
         break;
+    }
+    case 3:
+    {
+        lcd.setCursor(6, 1);
+        lcd.cursor_on();
+        if (display == 3)
+        {
+            threshold1 += 5;
+            lcd.print(threshold1);
+        }
+        if (display == 4)
+        {
+            threshold2 += 5;
+            lcd.print(threshold2);
+        }
+        break;
+    }
+    case 4:
 
     default:
         break;
     }
 }
 
-void LCD_didplay(int x)
+void LCD_display(int x)
 {
     lcd.setCursor(0, 0);
     lcd.print(words[x][0]);
