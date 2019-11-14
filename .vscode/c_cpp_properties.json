@@ -6,10 +6,14 @@
                 "D:\\Programatory\\Arduino\\tools\\**",
                 "D:\\Programatory\\Arduino\\hardware\\arduino\\avr\\**",
                 "C:\\Users\\arkad\\Documents\\Arduino\\libraries",
-                "D:\\Programatory\\Arduino\\libraries"
+                "C:\\Users\\serwis\\Documents\\Arduino\\libraries",
+                "D:\\Programatory\\Arduino\\libraries",
+                "D:\\Programowanie\\Arduino\\hardware\\arduino\\avr\\**",
+                "D:\\Programowanie\\Arduino\\tools\\**"
             ],
             "forcedInclude": [
-                "D:\\Programatory\\Arduino\\hardware\\arduino\\avr\\cores\\arduino\\Arduino.h"
+                "D:\\Programatory\\Arduino\\hardware\\arduino\\avr\\cores\\arduino\\Arduino.h",
+                "D:\\Programowanie\\Arduino\\hardware\\arduino\\avr\\cores\\arduino\\Arduino.h"
             ],
             "intelliSenseMode": "msvc-x64"
         }
