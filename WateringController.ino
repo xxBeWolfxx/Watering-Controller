@@ -39,7 +39,10 @@ int displayLCD = 0; //
 
 void setup()
 {
-    threshold1 = EEPROM.read(EEPROMthreshold1); //read last value of threshold
+    for (int i = 4; i < 10; i++)
+
+        pinMode()
+            threshold1 = EEPROM.read(EEPROMthreshold1); //read last value of threshold
     threshold2 = EEPROM.read(EEPROMthreshold2);
     temphold1 = threshold1;
     temphold2 = threshold2;
@@ -214,4 +217,11 @@ void SensoreRead()
         counter = 0;
     }
     counter++;
+}
+
+void WaterPump()
+{
+    if (sensorValue1 <= temphold1)
+    {
+    }
 }
