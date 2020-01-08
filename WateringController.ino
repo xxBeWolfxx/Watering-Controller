@@ -10,11 +10,11 @@
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 //**************************Define special function**********************************
-int KeyboardCheck();
-void LCD_swipe(int x);
-void LCD_displayLCD(int x);
-void SensoreRead();
-void WaterPump();
+int KeyboardCheck();     //checking if button was pressed
+void LCD_swipe(int x);   //changing scenes on LCD
+void LCD_display(int x); //printing LCD
+void SensoreRead();      //reading values from sensors
+void WaterPump();        //turn on or off diods and pumps
 
 //**************************Variables********************************
 String words[7][2] =
@@ -27,34 +27,37 @@ String words[7][2] =
         {"      SAVED     ", "       !!       "},
         {"     Return     ", "       !!       "}
 
-};
+};                  //declare all scenes
 int threshold1 = 0; //set threshold for each plant
 int threshold2 = 0;
-int temphold1;
+int temphold1; //temporary value of thresholds, which disappear after turnig off
 int temphold2;
-int counter = 0;
-int sensorValue1 = 0;
+int counter = 0; //counters which will count every period of every executing
+int counterPomp1 = 0;
+int counterPomp2 = 0;
+int sensorValue1 = 0; //value of humidity sensor
 int sensorValue2 = 0;
-int displayLCD = 0; //
+int displayLCD = 0; //which scene is showing now
 
 void setup()
 {
     for (int i = 4; i < 10; i++)
+        pinMode(i, 1);
 
-        pinMode()
-            threshold1 = EEPROM.read(EEPROMthreshold1); //read last value of threshold
+    threshold1 = EEPROM.read(EEPROMthreshold1); //read last value of threshold
     threshold2 = EEPROM.read(EEPROMthreshold2);
+
     temphold1 = threshold1;
     temphold2 = threshold2;
 
     lcd.begin();
     lcd.backlight();
     lcd.clear();
-    LCD_display(displayLCD);
+    LCD_display(displayLCD); //show first scene on LCD
     displayLCD++;
     delay(1000);
     lcd.clear();
-    Serial.begin(9600);
+    //Serial.begin(9600);
 }
 
 void loop()
@@ -62,14 +65,16 @@ void loop()
     SensoreRead();
     LCD_display(displayLCD);
     LCD_swipe(KeyboardCheck());
+    WaterPump();
 }
 
+//******************FUNCTIONS*********************
 int KeyboardCheck()
 {
     int reading = analogRead(A0);
     delay(100);
     // int temp = analogRead(A0);
-    Serial.println(reading);
+    //Serial.println(reading);
     //Serial.println(temp);
     if (reading < 1030 && reading > 1010)
         return 0;
@@ -221,7 +226,36 @@ void SensoreRead()
 
 void WaterPump()
 {
-    if (sensorValue1 <= temphold1)
+    if (sensorValue1 <= threshold1)
     {
+        digitalWrite(4, 0);
+        digitalWrite(6, 1);
+        digitalWrite(7, 0);
+    }
+    else if (sensorValue2 <= threshold2)
+    {
+        digitalWrite(5, 0);
+        digitalWrite(8, 1);
+        digitalWrite(9, 0);
+    }
+    if (sensorValue1 >= threshold1)
+    {
+        digitalWrite(6, 0);
+        digitalWrite(7, 1);
+        if (counterPomp1 < 50)
+        {
+            digitalWrite(4, 1);
+            counterPomp1++;
+        }
+    }
+    else if (sensorValue2 >= threshold2)
+    {
+        digitalWrite(8, 0);
+        digitalWrite(9, 1);
+        if (counterPomp2 < 50)
+        {
+            digitalWrite(5, 1);
+            counterPomp2++;
+        }
     }
 }
