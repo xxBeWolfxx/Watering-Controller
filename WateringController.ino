@@ -55,8 +55,10 @@ void setup()
     lcd.clear();
     LCD_display(displayLCD); //show first scene on LCD
     displayLCD++;
-    delay(1000);
+    delay(1800);
     lcd.clear();
+    sensorValue1 = map(analogRead(senosrs1), 900, 0, 0, 100);
+    sensorValue2 = map(analogRead(senosrs2), 900, 0, 0, 100);
     //Serial.begin(9600);
 }
 
@@ -76,21 +78,21 @@ int KeyboardCheck()
     // int temp = analogRead(A0);
     //Serial.println(reading);
     //Serial.println(temp);
-    if (reading < 1030 && reading > 1010)
+    if (reading < 1025 && reading > 950)
         return 0;
-    if (reading < 1010) //check which button has been pushed
+    if (reading < 950) //check which button has been pushed
     {
-        if (reading < 390 && reading > 330)
+        if (reading < 450 && reading > 380) //Right button
             return 1;
-        if (reading < 70 && reading > 2)
+        if (reading < 40) //left button
             return -1;
-        if (reading < 565 && reading > 425)
+        if (reading < 650 && reading > 600) //Up button
             return 2;
-        if (reading < 660 && reading > 580)
+        if (reading < 770 && reading > 700) //Down button
             return -2;
-        if (reading < 700 && reading > 670)
+        if (reading < 870 && reading > 770) //Save button
             return 3;
-        if (reading < 750 && reading > 700)
+        if (reading < 910 && reading > 870) //Return button
             return 4;
     }
 }
@@ -153,18 +155,24 @@ void LCD_swipe(int x)
             threshold1 = temphold1;
             EEPROM.write(EEPROMthreshold1, threshold1);
             LCD_display(5);
+            delay(1000);
+            lcd.clear();
         }
         if (displayLCD == 4)
         {
             threshold2 = temphold2;
             EEPROM.write(EEPROMthreshold2, threshold2);
             LCD_display(5);
+            delay(1000);
+            lcd.clear();
         }
         break;
     }
     case 4:
     {
         LCD_display(6);
+        delay(1000);
+        lcd.clear();
         break;
     }
     default:
@@ -180,7 +188,7 @@ void LCD_display(int x)
     lcd.print(words[x][1]);
     if (x == 1 || x == 2)
     {
-        lcd.setCursor(9, 0);
+        lcd.setCursor(8, 0);
         if (x == 1)
         {
             lcd.print(threshold1);
@@ -217,8 +225,8 @@ void SensoreRead()
 {
     if (counter == 50)
     {
-        sensorValue1 = map(analogRead(senosrs1), 1024, 0, 0, 100);
-        sensorValue2 = map(analogRead(senosrs2), 1024, 0, 0, 100);
+        sensorValue1 = map(analogRead(senosrs1), 900, 0, 0, 100);
+        sensorValue2 = map(analogRead(senosrs2), 900, 0, 0, 100);
         counter = 0;
     }
     counter++;
@@ -226,36 +234,38 @@ void SensoreRead()
 
 void WaterPump()
 {
-    if (sensorValue1 <= threshold1)
+    if (sensorValue1 > threshold1)
     {
         digitalWrite(4, 0);
-        digitalWrite(6, 1);
-        digitalWrite(7, 0);
+        digitalWrite(6, 0);
+        digitalWrite(7, 1);
     }
-    else if (sensorValue2 <= threshold2)
+    if (sensorValue2 > threshold2)
     {
         digitalWrite(5, 0);
         digitalWrite(8, 1);
         digitalWrite(9, 0);
     }
-    if (sensorValue1 >= threshold1)
+    if (sensorValue1 <= threshold1)
     {
-        digitalWrite(6, 0);
-        digitalWrite(7, 1);
+        digitalWrite(6, 1);
+        digitalWrite(7, 0);
         if (counterPomp1 < 50)
         {
             digitalWrite(4, 1);
-            counterPomp1++;
+            counterPomp1 = 0;
         }
+        counterPomp1++;
     }
-    else if (sensorValue2 >= threshold2)
+    if (sensorValue2 <= threshold2)
     {
         digitalWrite(8, 0);
         digitalWrite(9, 1);
         if (counterPomp2 < 50)
         {
             digitalWrite(5, 1);
-            counterPomp2++;
+            counterPomp2 = 0;
         }
+        counterPomp2++;
     }
 }
