@@ -57,9 +57,8 @@ void setup()
     displayLCD++;
     delay(1800);
     lcd.clear();
-    sensorValue1 = map(analogRead(senosrs1), 900, 0, 0, 100);
-    sensorValue2 = map(analogRead(senosrs2), 900, 0, 0, 100);
-    //Serial.begin(9600);
+    sensorValue1 = map(analogRead(senosrs1), 1024, 0, 0, 100);
+    sensorValue2 = map(analogRead(senosrs2), 1024, 0, 0, 100);
 }
 
 void loop()
@@ -73,11 +72,8 @@ void loop()
 //******************FUNCTIONS*********************
 int KeyboardCheck()
 {
-    int reading = analogRead(A0);
+    int reading = analogRead(kboard);
     delay(100);
-    // int temp = analogRead(A0);
-    //Serial.println(reading);
-    //Serial.println(temp);
     if (reading < 1025 && reading > 950)
         return 0;
     if (reading < 950) //check which button has been pushed
@@ -173,6 +169,14 @@ void LCD_swipe(int x)
         LCD_display(6);
         delay(1000);
         lcd.clear();
+        if (displayLCD == 3)
+        {
+            temphold1 = threshold1;
+        }
+        if (displayLCD == 4)
+        {
+            temphold2 = threshold2;
+        }
         break;
     }
     default:
@@ -225,8 +229,8 @@ void SensoreRead()
 {
     if (counter == 50)
     {
-        sensorValue1 = map(analogRead(senosrs1), 900, 0, 0, 100);
-        sensorValue2 = map(analogRead(senosrs2), 900, 0, 0, 100);
+        sensorValue1 = map(analogRead(senosrs1), 1024, 0, 0, 100);
+        sensorValue2 = map(analogRead(senosrs2), 1024, 0, 0, 100);
         counter = 0;
     }
     counter++;
