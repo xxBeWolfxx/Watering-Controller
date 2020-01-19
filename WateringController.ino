@@ -228,7 +228,7 @@ void LCD_display(int x)
     }
     return;
 }
-void SensoreRead()
+void SensoreRead() //add array to make avarage value of sensores
 {
     tabValue[counter][0] = map(analogRead(senosrs1), 1024, 0, 0, 100);
     tabValue[counter][1] = map(analogRead(senosrs2), 1024, 0, 0, 100);
