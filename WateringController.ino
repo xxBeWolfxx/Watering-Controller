@@ -39,6 +39,7 @@ int counterPomp1 = 0;
 int counterPomp2 = 0;
 int sensorValue1 = 0; //value of humidity sensor
 int sensorValue2 = 0;
+int tabValue[20][2];
 int displayLCD = 0; //which scene is showing now
 
 void setup()
@@ -229,13 +230,24 @@ void LCD_display(int x)
 }
 void SensoreRead()
 {
-    if (counter == 50)
+    tabValue[counter][0] = map(analogRead(senosrs1), 1024, 0, 0, 100);
+    tabValue[counter][1] = map(analogRead(senosrs2), 1024, 0, 0, 100);
+    if (counter == 20)
     {
-        sensorValue1 = map(analogRead(senosrs1), 1024, 0, 0, 100);
-        sensorValue2 = map(analogRead(senosrs2), 1024, 0, 0, 100);
+        for (int i = 0; i < 21; i++)
+        {
+            sensorValue1 = sensorValue1 + tabValue[i][0];
+            sensorValue2 = sensorValue2 + tabValue[i][2];
+        }
         counter = 0;
+        return;
     }
+
     counter++;
+    sensorValue1 = 0;
+    sensorValue2 = 0;
+
+    return;
 }
 
 void WaterPump()
