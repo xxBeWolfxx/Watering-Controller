@@ -1,3 +1,5 @@
+//v1.0.0
+
 #include <LiquidCrystal_I2C.h>
 #include <EEPROM.h>
 
@@ -37,6 +39,7 @@ int counterPomp1 = 0;
 int counterPomp2 = 0;
 int sensorValue1 = 0; //value of humidity sensor
 int sensorValue2 = 0;
+int tabValue[20][2];
 int displayLCD = 0; //which scene is showing now
 
 void setup()
@@ -57,9 +60,8 @@ void setup()
     displayLCD++;
     delay(1800);
     lcd.clear();
-    sensorValue1 = map(analogRead(senosrs1), 900, 0, 0, 100);
-    sensorValue2 = map(analogRead(senosrs2), 900, 0, 0, 100);
-    //Serial.begin(9600);
+    sensorValue1 = map(analogRead(senosrs1), 1024, 0, 0, 100);
+    sensorValue2 = map(analogRead(senosrs2), 1024, 0, 0, 100);
 }
 
 void loop()
@@ -73,11 +75,8 @@ void loop()
 //******************FUNCTIONS*********************
 int KeyboardCheck()
 {
-    int reading = analogRead(A0);
+    int reading = analogRead(kboard);
     delay(100);
-    // int temp = analogRead(A0);
-    //Serial.println(reading);
-    //Serial.println(temp);
     if (reading < 1025 && reading > 950)
         return 0;
     if (reading < 950) //check which button has been pushed
@@ -173,6 +172,14 @@ void LCD_swipe(int x)
         LCD_display(6);
         delay(1000);
         lcd.clear();
+        if (displayLCD == 3)
+        {
+            temphold1 = threshold1;
+        }
+        if (displayLCD == 4)
+        {
+            temphold2 = threshold2;
+        }
         break;
     }
     default:
@@ -221,15 +228,26 @@ void LCD_display(int x)
     }
     return;
 }
-void SensoreRead()
+void SensoreRead() //add array to make avarage value of sensores
 {
-    if (counter == 50)
+    tabValue[counter][0] = map(analogRead(senosrs1), 1024, 0, 0, 100);
+    tabValue[counter][1] = map(analogRead(senosrs2), 1024, 0, 0, 100);
+    if (counter == 20)
     {
-        sensorValue1 = map(analogRead(senosrs1), 900, 0, 0, 100);
-        sensorValue2 = map(analogRead(senosrs2), 900, 0, 0, 100);
+        for (int i = 0; i < 21; i++)
+        {
+            sensorValue1 = sensorValue1 + tabValue[i][0];
+            sensorValue2 = sensorValue2 + tabValue[i][2];
+        }
         counter = 0;
+        return;
     }
+
     counter++;
+    sensorValue1 = 0;
+    sensorValue2 = 0;
+
+    return;
 }
 
 void WaterPump()
