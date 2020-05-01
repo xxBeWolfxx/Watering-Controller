@@ -1,27 +1,25 @@
-//v1.0.0
+//v2.0.0
 
-#include <LiquidCrystal_I2C.h>
 #include <EEPROM.h>
 
-#define kboard A0
 #define EEPROMthreshold1 0
 #define EEPROMthreshold2 1
-#define senosrs1 A1
-#define senosrs2 A2
-
-LiquidCrystal_I2C lcd(0x27, 16, 2);
+#define senosrs1 A0
+#define senosrs2 A1
+#define senosrs3 A2
+#define PUMP1 13 //YOU MUST CHECK if this is correct
+#define PUMP2 11
 
 //**************************Define special function**********************************
-int KeyboardCheck();     //checking if button was pressed
-void LCD_swipe(int x);   //changing scenes on LCD
-void LCD_display(int x); //printing LCD
-void SensoreRead();      //reading values from sensors
-void WaterPump();        //turn on or off diods and pumps
+//void LCD_swipe(int x);   //changing scenes on LCD
+//void LCD_display(int x); //printing LCD
+void SensoreRead(); //reading values from sensors
+void WaterPump();   //turn on or off diods and pumps
 
 //**************************Variables********************************
 String words[7][2] =
     {
-        {"  Watering  ", "Controller v1.0"},
+        {"  Watering  ", "Controller v2.0.0"},
         {"1.Plant:", "Humidity:"},
         {"2.Plant:", "Humidity:"},
         {"1.Changing", "Value:"},
@@ -34,16 +32,25 @@ int threshold1 = 0; //set threshold for each plant
 int threshold2 = 0;
 int temphold1; //temporary value of thresholds, which disappear after turnig off
 int temphold2;
+int sensorTemperature;
+int sensorValue1 = 0; //value of humidity sensor
+int sensorValue2 = 0;
+int tabValue[20][3];
+int displayOLED = 0;                                   //which scene is showing now
+int workingPeriod[] = {2, 4, 5, 10, 30, 60, 120};      //how long the pump have to works
+int workingIntensity[] = {5, 10, 20, 40, 50, 80, 100}; //how many energy need to
+
+//*******************************counters***********************************
+
 int counter = 0; //counters which will count every period of every executing
 int counterPomp1 = 0;
 int counterPomp2 = 0;
-int sensorValue1 = 0; //value of humidity sensor
-int sensorValue2 = 0;
-int tabValue[20][2];
-int displayLCD = 0; //which scene is showing now
 
 void setup()
 {
+    for (int j = 2; j < 5; j++)
+        pinMode(j, INPUT_PULLUP);
+
     for (int i = 4; i < 10; i++)
         pinMode(i, 1);
 
@@ -53,13 +60,9 @@ void setup()
     temphold1 = threshold1;
     temphold2 = threshold2;
 
-    lcd.begin();
-    lcd.backlight();
-    lcd.clear();
-    LCD_display(displayLCD); //show first scene on LCD
+    //  LCD_display(displayLCD); //show first scene on LCD
     displayLCD++;
     delay(1800);
-    lcd.clear();
     sensorValue1 = map(analogRead(senosrs1), 1024, 0, 0, 100);
     sensorValue2 = map(analogRead(senosrs2), 1024, 0, 0, 100);
 }
@@ -67,36 +70,10 @@ void setup()
 void loop()
 {
     SensoreRead();
-    LCD_display(displayLCD);
-    LCD_swipe(KeyboardCheck());
-    WaterPump();
 }
-
 //******************FUNCTIONS*********************
-int KeyboardCheck()
-{
-    int reading = analogRead(kboard);
-    delay(100);
-    if (reading < 1025 && reading > 950)
-        return 0;
-    if (reading < 950) //check which button has been pushed
-    {
-        if (reading < 450 && reading > 380) //Right button
-            return 1;
-        if (reading < 40) //left button
-            return -1;
-        if (reading < 650 && reading > 600) //Up button
-            return 2;
-        if (reading < 770 && reading > 700) //Down button
-            return -2;
-        if (reading < 870 && reading > 770) //Save button
-            return 3;
-        if (reading < 910 && reading > 870) //Return button
-            return 4;
-    }
-}
 
-void LCD_swipe(int x)
+/*void LCD_swipe(int x)
 {
     if (x == 0)
         return;
@@ -228,18 +205,25 @@ void LCD_display(int x)
     }
     return;
 }
+*/
 void SensoreRead() //add array to make avarage value of sensores
 {
     tabValue[counter][0] = map(analogRead(senosrs1), 1024, 0, 0, 100);
     tabValue[counter][1] = map(analogRead(senosrs2), 1024, 0, 0, 100);
+    tabValue[counter][2] = map(analogRead(senosrs2), 1024, 0, 0, 100);
     if (counter == 20)
     {
-        for (int i = 0; i < 21; i++)
+        for (int i = 0; i < 19; i++)
         {
             sensorValue1 = sensorValue1 + tabValue[i][0];
-            sensorValue2 = sensorValue2 + tabValue[i][2];
+            sensorValue2 = sensorValue2 + tabValue[i][1];
+            sensorTemperature = sensorTemperature + tabValue[i][2];
         }
         counter = 0;
+        sensorValue1 = sensorValue1 / 20;
+        sensorValue2 = sensorValue2 / 20;
+        sensorTemperature = sensorTemperature / 20;
+
         return;
     }
 
@@ -250,40 +234,6 @@ void SensoreRead() //add array to make avarage value of sensores
     return;
 }
 
-void WaterPump()
+void WaterPump(int temperature, int Sensore1, int Sensore2)
 {
-    if (sensorValue1 > threshold1)
-    {
-        digitalWrite(4, 0);
-        digitalWrite(6, 0);
-        digitalWrite(7, 1);
-    }
-    if (sensorValue2 > threshold2)
-    {
-        digitalWrite(5, 0);
-        digitalWrite(8, 1);
-        digitalWrite(9, 0);
-    }
-    if (sensorValue1 <= threshold1)
-    {
-        digitalWrite(6, 1);
-        digitalWrite(7, 0);
-        if (counterPomp1 < 50)
-        {
-            digitalWrite(4, 1);
-            counterPomp1 = 0;
-        }
-        counterPomp1++;
-    }
-    if (sensorValue2 <= threshold2)
-    {
-        digitalWrite(8, 0);
-        digitalWrite(9, 1);
-        if (counterPomp2 < 50)
-        {
-            digitalWrite(5, 1);
-            counterPomp2 = 0;
-        }
-        counterPomp2++;
-    }
 }
