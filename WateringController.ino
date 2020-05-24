@@ -24,7 +24,7 @@ String words[7][2] =
         {"2.Plant:", "Humidity:"},
         {"1.Changing", "Value:"},
         {"2.Changing", "Value:"},
-        {"      SAVED     ", "       !!       "},
+        {"     SAVED!     ", "       !!       "},
         {"     Return     ", "       !!       "}
 
 };                  //declare all scenes
