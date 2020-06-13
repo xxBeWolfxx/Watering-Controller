@@ -1,6 +1,13 @@
 //v2.0.0
 
 #include <EEPROM.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+#include <SPI.h>
+#include <Wire.h>
+
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
 
 #define EEPROMthreshold1 0
 #define EEPROMthreshold2 1
@@ -9,6 +16,8 @@
 #define senosrs3 A2
 #define PUMP1 13 //YOU MUST CHECK if this is correct
 #define PUMP2 11
+
+#define NUMFLAKES 10 // Number of snowflakes in the animation example
 
 //**************************Define special function**********************************
 //void LCD_swipe(int x);   //changing scenes on LCD
@@ -27,7 +36,9 @@ String words[7][2] =
         {"     SAVED!     ", "       !!       "},
         {"     Return     ", "       !!       "}
 
-};                  //declare all scenes
+}; //declare all scenes
+Adafruit_SSD1306 display(4);
+
 int threshold1 = 0; //set threshold for each plant
 int threshold2 = 0;
 int temphold1; //temporary value of thresholds, which disappear after turnig off
@@ -48,6 +59,13 @@ int counterPomp2 = 0;
 
 void setup()
 {
+    if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C))
+    { // Address 0x3D for 128x64
+        Serial.println(F("SSD1306 allocation failed"));
+        for (;;)
+            ; // Don't proceed, loop forever
+    }
+
     for (int j = 2; j < 5; j++)
         pinMode(j, INPUT_PULLUP);
 
@@ -61,8 +79,7 @@ void setup()
     temphold2 = threshold2;
 
     //  LCD_display(displayLCD); //show first scene on LCD
-    displayLCD++;
-    delay(1800);
+
     sensorValue1 = map(analogRead(senosrs1), 1024, 0, 0, 100);
     sensorValue2 = map(analogRead(senosrs2), 1024, 0, 0, 100);
 }

@@ -18701,7 +18701,7 @@ Source: www.kingbright.com</description>
 <segment>
 <pinref part="C2" gate="G$1" pin="+"/>
 <wire x1="5.08" y1="162.56" x2="5.08" y2="167.64" width="0.1524" layer="91"/>
-<wire x1="5.08" y1="167.64" x2="0" y2="167.64" width="0.1524" layer="91"/>
+<wire x1="5.08" y1="167.64" x2="-2.54" y2="167.64" width="0.1524" layer="91"/>
 <pinref part="IC2" gate="A" pin="FB"/>
 <wire x1="-35.56" y1="172.72" x2="5.08" y2="172.72" width="0.1524" layer="91"/>
 <wire x1="5.08" y1="172.72" x2="5.08" y2="167.64" width="0.1524" layer="91"/>
