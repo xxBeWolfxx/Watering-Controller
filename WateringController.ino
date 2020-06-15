@@ -1,51 +1,65 @@
-//v1.0.0
+//v2.0.0
 
-#include <LiquidCrystal_I2C.h>
 #include <EEPROM.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+#include <SPI.h>
+#include <Wire.h>
 
-#define kboard A0
+#define SCREEN_WIDTH 124 // OLED display width, in pixels
+#define SCREEN_HEIGHT 28 // OLED display height, in pixels
+
 #define EEPROMthreshold1 0
 #define EEPROMthreshold2 1
-#define senosrs1 A1
-#define senosrs2 A2
-
-LiquidCrystal_I2C lcd(0x27, 16, 2);
+#define senosrs1 A0
+#define senosrs2 A1
+#define senosrs3 A2
+#define PUMP1 13 //YOU MUST CHECK if this is correct
+#define PUMP2 11
 
 //**************************Define special function**********************************
-int KeyboardCheck();     //checking if button was pressed
-void LCD_swipe(int x);   //changing scenes on LCD
-void LCD_display(int x); //printing LCD
-void SensoreRead();      //reading values from sensors
-void WaterPump();        //turn on or off diods and pumps
+void SensoreRead(); //reading values from sensors
+void WaterPump();   //turn on or off diods and pumps
 
 //**************************Variables********************************
 String words[7][2] =
     {
-        {"  Watering  ", "Controller v1.0"},
-        {"1.Plant:", "Humidity:"},
-        {"2.Plant:", "Humidity:"},
-        {"1.Changing", "Value:"},
+        {"Watering", "Controller v2.0.0"},
+        {"Plant:", "Humidity:"},
+        {"Temperature:", "Period:"},
+        {"1.Plant", "2.Plant"},
         {"2.Changing", "Value:"},
-        {"      SAVED     ", "       !!       "},
-        {"     Return     ", "       !!       "}
+        {"     SAVED!     ", "       Return       "},
+        {"     >     ", "ESC"}
 
-};                  //declare all scenes
+}; //declare all scenes
+Adafruit_SSD1306 display(4);
+
 int threshold1 = 0; //set threshold for each plant
 int threshold2 = 0;
 int temphold1; //temporary value of thresholds, which disappear after turnig off
 int temphold2;
+int sensorTemperature;
+int sensorValue1 = 0; //value of humidity sensor
+int sensorValue2 = 0;
+int tabValue[10][3];
+int screenOLED = 0;                                    //which scene is showing now
+int workingPeriod[] = {2, 4, 5, 10, 30, 60, 120};      //how long the pump have to works
+int workingIntensity[] = {5, 10, 20, 40, 50, 80, 100}; //how many energy need to
+
+//*******************************counters***********************************
+
 int counter = 0; //counters which will count every period of every executing
 int counterPomp1 = 0;
 int counterPomp2 = 0;
-int sensorValue1 = 0; //value of humidity sensor
-int sensorValue2 = 0;
-int tabValue[20][2];
-int displayLCD = 0; //which scene is showing now
 
 void setup()
 {
-    for (int i = 4; i < 10; i++)
-        pinMode(i, 1);
+    display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+
+    display.clearDisplay();
+    display.setTextSize(1);
+    display.setTextColor(WHITE);
 
     threshold1 = EEPROM.read(EEPROMthreshold1); //read last value of threshold
     threshold2 = EEPROM.read(EEPROMthreshold2);
@@ -53,193 +67,36 @@ void setup()
     temphold1 = threshold1;
     temphold2 = threshold2;
 
-    lcd.begin();
-    lcd.backlight();
-    lcd.clear();
-    LCD_display(displayLCD); //show first scene on LCD
-    displayLCD++;
-    delay(1800);
-    lcd.clear();
+    DisplayOLED(screenOLED++); //show first scene on LCD
+
     sensorValue1 = map(analogRead(senosrs1), 1024, 0, 0, 100);
     sensorValue2 = map(analogRead(senosrs2), 1024, 0, 0, 100);
 }
 
 void loop()
 {
+
     SensoreRead();
-    LCD_display(displayLCD);
-    LCD_swipe(KeyboardCheck());
-    WaterPump();
 }
 
-//******************FUNCTIONS*********************
-int KeyboardCheck()
-{
-    int reading = analogRead(kboard);
-    delay(100);
-    if (reading < 1025 && reading > 950)
-        return 0;
-    if (reading < 950) //check which button has been pushed
-    {
-        if (reading < 450 && reading > 380) //Right button
-            return 1;
-        if (reading < 40) //left button
-            return -1;
-        if (reading < 650 && reading > 600) //Up button
-            return 2;
-        if (reading < 770 && reading > 700) //Down button
-            return -2;
-        if (reading < 870 && reading > 770) //Save button
-            return 3;
-        if (reading < 910 && reading > 870) //Return button
-            return 4;
-    }
-}
-
-void LCD_swipe(int x)
-{
-    if (x == 0)
-        return;
-    lcd.clear();
-    switch (x)
-    {
-    case -1:
-    {
-        if (displayLCD == 1)
-            displayLCD = 4;
-        else
-            displayLCD--;
-        break;
-    }
-    case 1:
-    {
-        if (displayLCD == 4)
-            displayLCD = 1;
-        else
-            displayLCD++;
-        break;
-    }
-    case 2:
-    {
-        if (displayLCD == 3)
-        {
-            if (temphold1 <= 100)
-                temphold1 += 5;
-        }
-        if (displayLCD == 4)
-        {
-            if (temphold2 <= 100)
-                temphold2 += 5;
-        }
-        break;
-    }
-    case -2:
-    {
-        if (displayLCD == 3)
-        {
-            if (temphold1 >= 0)
-                temphold1 -= 5;
-        }
-        if (displayLCD == 4)
-        {
-            if (temphold2 >= 0)
-                temphold2 -= 5;
-        }
-        break;
-    }
-    case 3:
-    {
-        if (displayLCD == 3)
-        {
-            threshold1 = temphold1;
-            EEPROM.write(EEPROMthreshold1, threshold1);
-            LCD_display(5);
-            delay(1000);
-            lcd.clear();
-        }
-        if (displayLCD == 4)
-        {
-            threshold2 = temphold2;
-            EEPROM.write(EEPROMthreshold2, threshold2);
-            LCD_display(5);
-            delay(1000);
-            lcd.clear();
-        }
-        break;
-    }
-    case 4:
-    {
-        LCD_display(6);
-        delay(1000);
-        lcd.clear();
-        if (displayLCD == 3)
-        {
-            temphold1 = threshold1;
-        }
-        if (displayLCD == 4)
-        {
-            temphold2 = threshold2;
-        }
-        break;
-    }
-    default:
-        break;
-    }
-}
-
-void LCD_display(int x)
-{
-    lcd.setCursor(0, 0);
-    lcd.print(words[x][0]);
-    lcd.setCursor(0, 1);
-    lcd.print(words[x][1]);
-    if (x == 1 || x == 2)
-    {
-        lcd.setCursor(8, 0);
-        if (x == 1)
-        {
-            lcd.print(threshold1);
-        }
-        else if (x == 2)
-        {
-            lcd.print(threshold2);
-        }
-        lcd.setCursor(9, 1);
-        if (x == 1)
-        {
-            lcd.print(sensorValue1);
-        }
-        else if (x == 2)
-        {
-            lcd.print(sensorValue2);
-        }
-    }
-    else if (x == 3 || x == 4)
-    {
-        lcd.setCursor(6, 1);
-        if (x == 3)
-        {
-            lcd.print(temphold1);
-        }
-        else if (x == 4)
-        {
-            lcd.print(temphold2);
-        }
-    }
-    return;
-}
 void SensoreRead() //add array to make avarage value of sensores
 {
     tabValue[counter][0] = map(analogRead(senosrs1), 1024, 0, 0, 100);
     tabValue[counter][1] = map(analogRead(senosrs2), 1024, 0, 0, 100);
-    if (counter == 20)
+    tabValue[counter][2] = map(analogRead(senosrs2), 1024, 0, 0, 100);
+    if (counter == 9)
     {
-        for (int i = 0; i < 21; i++)
+        for (int i = 0; i < 10; i++)
         {
             sensorValue1 = sensorValue1 + tabValue[i][0];
-            sensorValue2 = sensorValue2 + tabValue[i][2];
+            sensorValue2 = sensorValue2 + tabValue[i][1];
+            sensorTemperature = sensorTemperature + tabValue[i][2];
         }
         counter = 0;
+        sensorValue1 = sensorValue1 / 10;
+        sensorValue2 = sensorValue2 / 10;
+        sensorTemperature = sensorTemperature / 10;
+
         return;
     }
 
@@ -250,40 +107,31 @@ void SensoreRead() //add array to make avarage value of sensores
     return;
 }
 
-void WaterPump()
+void DisplayOLED(int screenOLED)
 {
-    if (sensorValue1 > threshold1)
+    if (screenOLED == 0)
     {
-        digitalWrite(4, 0);
-        digitalWrite(6, 0);
-        digitalWrite(7, 1);
+        display.setCursor(0, 0);
+        display.println(words[screenOLED][screenOLED]);
+        display.setCursor(0, 8);
+        display.println(words[screenOLED][screenOLED + 1]);
+        display.display();
     }
-    if (sensorValue2 > threshold2)
+    if (screenOLED == 1)
     {
-        digitalWrite(5, 0);
-        digitalWrite(8, 1);
-        digitalWrite(9, 0);
+        display.setCursor(0, 0);
+        display.print(words[screenOLED][screenOLED]);
+        display.setCursor(30, 0);
+        display.print(threshold1);
+        display.setCursor(0, 8);
+        display.println(words[screenOLED][screenOLED + 1]);
+        display.setCursor(30, 0);
+        display.display();
     }
-    if (sensorValue1 <= threshold1)
-    {
-        digitalWrite(6, 1);
-        digitalWrite(7, 0);
-        if (counterPomp1 < 50)
-        {
-            digitalWrite(4, 1);
-            counterPomp1 = 0;
-        }
-        counterPomp1++;
-    }
-    if (sensorValue2 <= threshold2)
-    {
-        digitalWrite(8, 0);
-        digitalWrite(9, 1);
-        if (counterPomp2 < 50)
-        {
-            digitalWrite(5, 1);
-            counterPomp2 = 0;
-        }
-        counterPomp2++;
-    }
+
+    delay(2000);
+}
+
+void WaterPump(int temperature, int Sensore1, int Sensore2)
+{
 }
