@@ -32,8 +32,8 @@ String words[7][2] =
         {"     SAVED!     ", "       Return       "},
         {"     >     ", "ESC"}
 
-}; //declare all scenes
-Adafruit_SSD1306 display(4);
+};                           //declare all scenes
+Adafruit_SSD1306 display(9); //
 
 int threshold1 = 0; //set threshold for each plant
 int threshold2 = 0;
