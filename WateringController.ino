@@ -11,9 +11,12 @@
 
 #define EEPROMthreshold1 0
 #define EEPROMthreshold2 1
+
 #define senosrs1 A0
 #define senosrs2 A1
 #define senosrs3 A2
+#define TemperatureSensor A3
+
 #define PUMP1 13 //YOU MUST CHECK if this is correct
 #define PUMP2 11
 
@@ -39,10 +42,13 @@ int threshold1 = 0; //set threshold for each plant
 int threshold2 = 0;
 int temphold1; //temporary value of thresholds, which disappear after turnig off
 int temphold2;
-int sensorTemperature;
-int sensorValue1 = 0; //value of humidity sensor
-int sensorValue2 = 0;
-int tabValue[10][3];
+
+int sensorTemperature = 0;
+int sensorHUM1 = 0; //value of humidity sensor
+int sensorHUM2 = 0;
+int sensorBright = 0;
+
+int tabValue[10][4];
 int screenOLED = 0;                                    //which scene is showing now
 int workingPeriod[] = {2, 4, 5, 10, 30, 60, 120};      //how long the pump have to works
 int workingIntensity[] = {5, 10, 20, 40, 50, 80, 100}; //how many energy need to
@@ -56,7 +62,6 @@ int counterPomp2 = 0;
 void setup()
 {
     display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
-
     display.clearDisplay();
     display.setTextSize(1);
     display.setTextColor(WHITE);
@@ -69,8 +74,10 @@ void setup()
 
     DisplayOLED(screenOLED++); //show first scene on LCD
 
-    sensorValue1 = map(analogRead(senosrs1), 1024, 0, 0, 100);
-    sensorValue2 = map(analogRead(senosrs2), 1024, 0, 0, 100);
+    sensorHUM1 = map(analogRead(senosrs1), 1024, 0, 0, 100);
+    sensorHUM2 = map(analogRead(senosrs2), 1024, 0, 0, 100);
+    sensorTemperature = map(analogRead(TemperatureSensor), 1024, 0, 0, 100);
+    sensorBright = map(analogRead(sensors3), 1024, 0, 0, 100);
 }
 
 void loop()
@@ -83,26 +90,31 @@ void SensoreRead() //add array to make avarage value of sensores
 {
     tabValue[counter][0] = map(analogRead(senosrs1), 1024, 0, 0, 100);
     tabValue[counter][1] = map(analogRead(senosrs2), 1024, 0, 0, 100);
-    tabValue[counter][2] = map(analogRead(senosrs2), 1024, 0, 0, 100);
+    tabValue[counter][2] = map(analogRead(senosrs3), 1024, 0, 0, 100);
+    tabValue[counter][3] = map(analogRead(TemperatureSensor), 1024, 0, 0, 100);
     if (counter == 9)
     {
+        sensorBright = 0;
+        sensorHUM1 = 0;
+        sensorHUM2 = 0;
+        sensorTemperature = 0;
+
         for (int i = 0; i < 10; i++)
         {
-            sensorValue1 = sensorValue1 + tabValue[i][0];
-            sensorValue2 = sensorValue2 + tabValue[i][1];
-            sensorTemperature = sensorTemperature + tabValue[i][2];
+            sensorHUM1 = sensorHUM1 + tabValue[i][0];
+            sensorHUM2 = sensorHUM2 + tabValue[i][1];
+            sensorBright = sensorBright + tabValue[i][2];
+            sensorTemperature = sensorTemperature + tabValue[i][3];
         }
         counter = 0;
-        sensorValue1 = sensorValue1 / 10;
-        sensorValue2 = sensorValue2 / 10;
+        sensorHUM1 = sensorHUM1 / 10;
+        sensorHUM2 = sensorHUM2 / 10;
         sensorTemperature = sensorTemperature / 10;
 
         return;
     }
 
     counter++;
-    sensorValue1 = 0;
-    sensorValue2 = 0;
 
     return;
 }
