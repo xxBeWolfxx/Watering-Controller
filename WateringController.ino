@@ -12,9 +12,9 @@
 #define EEPROMthreshold1 0
 #define EEPROMthreshold2 1
 
-#define senosrs1 A0
-#define senosrs2 A1
-#define senosrs3 A2
+#define sensors1 A0
+#define sensors2 A1
+#define sensors3 A2
 #define TemperatureSensor A3
 
 #define PUMP1 13 //YOU MUST CHECK if this is correct
@@ -74,8 +74,8 @@ void setup()
 
     DisplayOLED(screenOLED++); //show first scene on LCD
 
-    sensorHUM1 = map(analogRead(senosrs1), 1024, 0, 0, 100);
-    sensorHUM2 = map(analogRead(senosrs2), 1024, 0, 0, 100);
+    sensorHUM1 = map(analogRead(sensors1), 1024, 0, 0, 100);
+    sensorHUM2 = map(analogRead(sensors2), 1024, 0, 0, 100);
     sensorTemperature = map(analogRead(TemperatureSensor), 1024, 0, 0, 100);
     sensorBright = map(analogRead(sensors3), 1024, 0, 0, 100);
 }
@@ -88,9 +88,9 @@ void loop()
 
 void SensoreRead() //add array to make avarage value of sensores
 {
-    tabValue[counter][0] = map(analogRead(senosrs1), 1024, 0, 0, 100);
-    tabValue[counter][1] = map(analogRead(senosrs2), 1024, 0, 0, 100);
-    tabValue[counter][2] = map(analogRead(senosrs3), 1024, 0, 0, 100);
+    tabValue[counter][0] = map(analogRead(sensors1), 1024, 0, 0, 100);
+    tabValue[counter][1] = map(analogRead(sensors2), 1024, 0, 0, 100);
+    tabValue[counter][2] = map(analogRead(sensors3), 1024, 0, 0, 100);
     tabValue[counter][3] = map(analogRead(TemperatureSensor), 1024, 0, 0, 100);
     if (counter == 9)
     {
