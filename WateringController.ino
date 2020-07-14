@@ -11,6 +11,7 @@
 
 #define EEPROMthreshold1 0
 #define EEPROMthreshold2 1
+#define EEPROMtemperature 2
 
 #define sensors1 A0
 #define sensors2 A1
@@ -40,6 +41,7 @@ Adafruit_SSD1306 display(9); //
 
 int threshold1 = 0; //set threshold for each plant
 int threshold2 = 0;
+int Thresholdtemperature = 0;
 int temphold1; //temporary value of thresholds, which disappear after turnig off
 int temphold2;
 
@@ -68,7 +70,9 @@ void setup()
 
     threshold1 = EEPROM.read(EEPROMthreshold1); //read last value of threshold
     threshold2 = EEPROM.read(EEPROMthreshold2);
+    Thresholdtemperature = EEPROM.read(EEPROMtemperature);
 
+    temperature = Thresholdtemperature;
     temphold1 = threshold1;
     temphold2 = threshold2;
 
