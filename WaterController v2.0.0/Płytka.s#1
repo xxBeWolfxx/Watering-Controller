@@ -25741,11 +25741,6 @@ Canal N :
 </net>
 <net name="K1" class="0">
 <segment>
-<pinref part="U1" gate="G$1" pin="IO19"/>
-<wire x1="149.86" y1="118.745" x2="163.83" y2="118.745" width="0.1524" layer="91"/>
-<label x="160.655" y="118.745" size="1.778" layer="95"/>
-</segment>
-<segment>
 <pinref part="Q3" gate="G$1" pin="S"/>
 <wire x1="250.19" y1="220.345" x2="244.475" y2="220.345" width="0.1524" layer="91"/>
 <pinref part="R12" gate="G$1" pin="1"/>
@@ -25754,13 +25749,13 @@ Canal N :
 <junction x="244.475" y="220.345"/>
 <label x="235.585" y="220.345" size="1.778" layer="95"/>
 </segment>
+<segment>
+<pinref part="U1" gate="G$1" pin="IO5"/>
+<wire x1="149.86" y1="113.665" x2="163.83" y2="113.665" width="0.1524" layer="91"/>
+<label x="161.29" y="113.665" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="K2" class="0">
-<segment>
-<pinref part="U1" gate="G$1" pin="IO18"/>
-<wire x1="149.86" y1="116.205" x2="163.83" y2="116.205" width="0.1524" layer="91"/>
-<label x="160.655" y="116.205" size="1.778" layer="95"/>
-</segment>
 <segment>
 <pinref part="Q1" gate="G$1" pin="S"/>
 <wire x1="296.545" y1="217.17" x2="290.83" y2="217.17" width="0.1524" layer="91"/>
@@ -25770,13 +25765,13 @@ Canal N :
 <junction x="290.83" y="217.17"/>
 <label x="281.94" y="217.805" size="1.778" layer="95"/>
 </segment>
+<segment>
+<pinref part="U1" gate="G$1" pin="IO17"/>
+<wire x1="149.86" y1="111.125" x2="163.83" y2="111.125" width="0.1524" layer="91"/>
+<label x="161.29" y="111.125" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="K3" class="0">
-<segment>
-<pinref part="U1" gate="G$1" pin="IO5"/>
-<wire x1="149.86" y1="113.665" x2="163.83" y2="113.665" width="0.1524" layer="91"/>
-<label x="160.655" y="113.665" size="1.778" layer="95"/>
-</segment>
 <segment>
 <pinref part="Q2" gate="G$1" pin="S"/>
 <wire x1="347.345" y1="216.535" x2="341.63" y2="216.535" width="0.1524" layer="91"/>
@@ -25786,13 +25781,13 @@ Canal N :
 <junction x="341.63" y="216.535"/>
 <label x="333.375" y="217.17" size="1.778" layer="95"/>
 </segment>
+<segment>
+<pinref part="U1" gate="G$1" pin="IO16"/>
+<wire x1="149.86" y1="108.585" x2="163.83" y2="108.585" width="0.1524" layer="91"/>
+<label x="161.29" y="108.585" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="P1" class="0">
-<segment>
-<pinref part="U1" gate="G$1" pin="IO17"/>
-<wire x1="149.86" y1="111.125" x2="163.83" y2="111.125" width="0.1524" layer="91"/>
-<label x="160.655" y="111.125" size="1.778" layer="95"/>
-</segment>
 <segment>
 <pinref part="Q6" gate="G$1" pin="G"/>
 <wire x1="284.48" y1="149.225" x2="281.305" y2="149.225" width="0.1524" layer="91"/>
@@ -25802,13 +25797,13 @@ Canal N :
 <pinref part="R4" gate="G$1" pin="2"/>
 <label x="278.765" y="149.225" size="1.778" layer="95" rot="R180" xref="yes"/>
 </segment>
+<segment>
+<pinref part="U1" gate="G$1" pin="IO19"/>
+<wire x1="149.86" y1="118.745" x2="163.83" y2="118.745" width="0.1524" layer="91"/>
+<label x="161.29" y="118.745" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="P2" class="0">
-<segment>
-<pinref part="U1" gate="G$1" pin="IO16"/>
-<wire x1="149.86" y1="108.585" x2="163.83" y2="108.585" width="0.1524" layer="91"/>
-<label x="160.655" y="108.585" size="1.778" layer="95"/>
-</segment>
 <segment>
 <pinref part="R5" gate="G$1" pin="2"/>
 <wire x1="327.66" y1="140.97" x2="327.66" y2="148.59" width="0.1524" layer="91"/>
@@ -25817,6 +25812,11 @@ Canal N :
 <wire x1="332.74" y1="148.59" x2="327.66" y2="148.59" width="0.1524" layer="91"/>
 <junction x="327.66" y="148.59"/>
 <label x="318.135" y="149.225" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="U1" gate="G$1" pin="IO18"/>
+<wire x1="149.86" y1="116.205" x2="163.83" y2="116.205" width="0.1524" layer="91"/>
+<label x="161.29" y="116.205" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="N$1" class="0">
