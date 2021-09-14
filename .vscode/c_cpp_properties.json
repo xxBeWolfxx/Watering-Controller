@@ -3,17 +3,17 @@
         {
             "name": "Win32",
             "includePath": [
-                "D:\\Programatory\\Arduino\\tools\\**",
-                "D:\\Programatory\\Arduino\\hardware\\arduino\\avr\\**",
+                "D:\\Arduino\\tools\\**",
+                "D:\\Arduino\\hardware\\arduino\\avr\\**",
                 "C:\\Users\\arkad\\Documents\\Arduino\\libraries",
                 "C:\\Users\\serwis\\Documents\\Arduino\\libraries",
-                "D:\\Programatory\\Arduino\\libraries",
-                "D:\\Programowanie\\Arduino\\hardware\\arduino\\avr\\**",
-                "D:\\Programowanie\\Arduino\\tools\\**"
+                "D:\\Arduino\\libraries",
+                "D:\\Arduino\\hardware\\arduino\\avr\\**",
+                "D:\\Arduino\\tools\\**"
             ],
             "forcedInclude": [
                 "D:\\Programatory\\Arduino\\hardware\\arduino\\avr\\cores\\arduino\\Arduino.h",
-                "D:\\Programowanie\\Arduino\\hardware\\arduino\\avr\\cores\\arduino\\Arduino.h"
+                "D:\\Arduino\\hardware\\arduino\\avr\\cores\\arduino\\Arduino.h"
             ],
             "intelliSenseMode": "msvc-x64"
         }
