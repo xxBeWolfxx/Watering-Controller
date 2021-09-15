@@ -5,17 +5,19 @@
             "includePath": [
                 "D:\\Arduino\\tools\\**",
                 "D:\\Arduino\\hardware\\arduino\\avr\\**",
-                "C:\\Users\\arkad\\Documents\\Arduino\\libraries",
+                // "C:\\Users\\arkad\\Documents\\Arduino\\libraries",
                 "C:\\Users\\serwis\\Documents\\Arduino\\libraries",
                 "D:\\Arduino\\libraries",
                 "D:\\Arduino\\hardware\\arduino\\avr\\**",
                 "D:\\Arduino\\tools\\**"
             ],
             "forcedInclude": [
-                "D:\\Programatory\\Arduino\\hardware\\arduino\\avr\\cores\\arduino\\Arduino.h",
                 "D:\\Arduino\\hardware\\arduino\\avr\\cores\\arduino\\Arduino.h"
             ],
-            "intelliSenseMode": "msvc-x64"
+            "intelliSenseMode": "msvc-x64",
+            "defines": [
+                "USBCON"
+            ]
         }
     ],
     "version": 4
