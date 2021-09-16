@@ -1,10 +1,11 @@
 #include <Arduino.h>
 #include <WiFi.h>
-#include <WiFiClientSecure.h>
+#include "WiFiClientSecure.h"
 #include <string.h>
 #include <EEPROM.h>
 #include <WebSocketsClient.h>
 #include <ArduinoJson.h>
+#include <DallasTemperature.h>
 
 #define addressID 1
 #define baudRate 9600
