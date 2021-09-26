@@ -6,6 +6,7 @@
 #include <WebSocketsClient.h>
 #include <ArduinoJson.h>
 #include <DallasTemperature.h>
+#include "PIDcontroller.h"
 
 #define addressID 1
 #define baudRate 9600
