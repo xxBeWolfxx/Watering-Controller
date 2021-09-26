@@ -4,9 +4,9 @@
 #include "Arduino.h"
 
 #define MAXVALUE 255
+#define SAMPLETIME 0.02
 
-class PIDcontroller
-{
+class PIDcontroller {
 private:
     int typeOfController = 0;
 
