@@ -1,5 +1,6 @@
 #include "PIDcontroller.h"
 #include "WiFiClientSecure.h"
+#include "sensorTemperatureHandler.h"
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <DallasTemperature.h>
@@ -61,12 +62,6 @@ bool validID(int ID) {
     return false;
 }
 
-float readTemnperature() {
-    sensorTemperature.requestTemperatures();
-    float temperature = sensorTemperature.getTempCByIndex(0);
-    return temperature;
-}
-
 void webSocketEvent(WStype_t type, uint8_t *payload, size_t length) {
 }
 
@@ -75,6 +70,8 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length) {
 void setup() {
     Serial.begin(baudRate);
     WiFi.begin(ssid, password);
+
+    readTemnperature();
 
     while (WiFi.status() != WL_CONNECTED) {
         infoMessage("SETUP", "Waiting...");
