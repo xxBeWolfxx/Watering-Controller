@@ -1,6 +1,5 @@
 #include "PIDcontroller.h"
 #include "WiFiClientSecure.h"
-#include "sensorTemperatureHandler.h"
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <DallasTemperature.h>
@@ -16,11 +15,17 @@
 #define port 80
 #define reconnectInterval 5000
 #define ONE_WIRE_BUS 32
+#define sizeArrayTemperatures 10
+#define humidityMeasure 12
 
 //Define variables
 
+esp_sleep_wakeup_cause_t espBoard;
+
 float espID = 0;
 float espRemoteID = 0;
+
+PIDcontroller pidController;
 
 const char *ssid = "2.4G_echostar_5c82";
 const char *password = "00035022";
@@ -62,21 +67,35 @@ bool validID(int ID) {
     return false;
 }
 
+float readTemnperature() {
+    sensorTemperature.requestTemperatures();
+    return sensorTemperature.getTempCByIndex(0);
+}
+
+void sendDataToServer(float temperature, int humidity) {
+    document["ID"] = espID;
+    document["temperature"] = temperature;
+    document["humidity1"] = humidity;
+}
+
 void webSocketEvent(WStype_t type, uint8_t *payload, size_t length) {
 }
 
 //END Define functions
 
 void setup() {
+
     Serial.begin(baudRate);
     WiFi.begin(ssid, password);
+    okMessage("SETUP", "I AM RUNING");
 
-    readTemnperature();
+    pinMode(humidityMeasure, INPUT);
 
     while (WiFi.status() != WL_CONNECTED) {
         infoMessage("SETUP", "Waiting...");
         delay(500);
     }
+    okMessage("SETUP", "WIFI WORKS");
 
     //websocket
     webSocket.begin(serverIP, port, "/");
@@ -87,6 +106,11 @@ void setup() {
 }
 
 void loop() {
+
+    int hum1 = map(analogRead(humidityMeasure), 0, 255, 0, 100);
+    int temperature = readTemnperature();
+
+    sendDataToServer(temperature, hum1);
     webSocket.loop();
     // put your main code here, to run repeatedly:
 }
