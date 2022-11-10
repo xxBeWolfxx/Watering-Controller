@@ -1,5 +1,6 @@
 #include "PIDcontroller.h"
 #include "WiFiClientSecure.h"
+#include "Flowerprofile.hpp"
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <DallasTemperature.h>
@@ -19,8 +20,6 @@
 #define humidityMeasure 12
 
 //Define variables
-
-esp_sleep_wakeup_cause_t espBoard;
 
 float espID = 0;
 float espRemoteID = 0;
@@ -79,6 +78,12 @@ void sendDataToServer(float temperature, int humidity) {
 }
 
 void webSocketEvent(WStype_t type, uint8_t *payload, size_t length) {
+
+    DeserializationError error = deserializeJson(document, payload);
+    if (error) {
+        errorMessage("Error websocket event", error.c_str());
+    }
+    
 }
 
 //END Define functions
@@ -101,8 +106,8 @@ void setup() {
     webSocket.begin(serverIP, port, "/");
     webSocket.onEvent(webSocketEvent);
     webSocket.setReconnectInterval(reconnectInterval);
+    okMessage("SETUP", "WebSocket WORKS");
 
-    // put your setup code here, to run once:
 }
 
 void loop() {
@@ -112,5 +117,6 @@ void loop() {
 
     sendDataToServer(temperature, hum1);
     webSocket.loop();
+
     // put your main code here, to run repeatedly:
 }
