@@ -24,7 +24,7 @@
 float espID = 0;
 float espRemoteID = 0;
 
-PIDcontroller pidController;
+// PIDcontroller pidController;
 
 const char *ssid = "2.4G_echostar_5c82";
 const char *password = "00035022";
