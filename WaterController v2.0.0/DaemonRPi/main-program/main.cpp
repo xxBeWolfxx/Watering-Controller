@@ -6,28 +6,38 @@
 #include <iostream>
 #include <string>
 #include <thread>
-// g++ -I /usr/include/boost -pthread websocket.cpp
-namespace beast = boost::beast;         // from <boost/beast.hpp>
-namespace http = beast::http;           // from <boost/beast/http.hpp>
-namespace websocket = beast::websocket; // from <boost/beast/websocket.hpp>
-namespace net = boost::asio;            // from <boost/asio.hpp>
-using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
+
+
+
 
 int main() {
     DataRobot date = {};
     std::cout << "Hello, World!" << std::endl;
 
-//    std::string address = "127.0.0.1";
-//
-//    websocketService serverRPi = websocketService(address, 8083);
+    websocketService server_webSocket = websocketService("192.168.0.170", 8083);
 
-    auto const address = net::ip::make_address("127.0.0.1");
-    auto const port = static_cast<unsigned short>(std::atoi("8083"));
+    tcp::acceptor acceptor{server_webSocket.ioc, {server_webSocket.address, (unsigned short)server_webSocket.port}};
 
-    net::io_context ioc{1};
 
-    tcp::acceptor acceptor{ioc, {address, port}};
+    try {
 
+        for (;;) {
+            tcp::socket socket{server_webSocket.ioc};
+
+            // Block until we get a connection
+            acceptor.accept(socket);
+
+            // Launch the session, transferring ownership of the socket
+            std::thread t1(&websocketService::process, std::move(socket));
+            t1.detach();
+        }
+
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
 
     return 0;
 }

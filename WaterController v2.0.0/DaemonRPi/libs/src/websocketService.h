@@ -19,14 +19,14 @@ using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 
 class websocketService {
 
+public:
+    net::io_context ioc{1};
     net::ip::address address = {};
     uint32_t port;
 
-    net::io_context ioc{1};
-
-
-public:
     websocketService(std::string ipAddress, uint32_t port);
+
+    static void process(tcp::socket socket);
 
 };
 

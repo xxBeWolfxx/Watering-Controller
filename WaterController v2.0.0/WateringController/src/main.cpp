@@ -83,7 +83,7 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length) {
     if (error) {
         errorMessage("Error websocket event", error.c_str());
     }
-    
+    webSocket.sendTXT(password);
 }
 
 //END Define functions
