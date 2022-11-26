@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 //v2.0.0
 
 #include <EEPROM.h>
@@ -82,10 +83,17 @@ void setup()
     sensorHUM2 = map(analogRead(sensors2), 1024, 0, 0, 100);
     sensorTemperature = map(analogRead(TemperatureSensor), 1024, 0, 0, 100);
     sensorBright = map(analogRead(sensors3), 1024, 0, 0, 100);
+=======
+
+void setup()
+{
+    int a = 3 + 5;
+>>>>>>> 2357f7201e44869a9777a43edf4bb0054e2fd7d8
 }
 
 void loop()
 {
+<<<<<<< HEAD
 
     SensoreRead();
 }
@@ -150,4 +158,6 @@ void DisplayOLED(int screenOLED)
 
 void WaterPump(int temperature, int Sensore1, int Sensore2)
 {
+=======
+>>>>>>> 2357f7201e44869a9777a43edf4bb0054e2fd7d8
 }
