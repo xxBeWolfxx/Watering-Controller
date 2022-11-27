@@ -1,22 +1,22 @@
 #include <iostream>
-#include "Database.h"
-#include "websocketService.h"
 #include <boost/beast/core.hpp>
 #include <boost/beast/websocket.hpp>
 #include <iostream>
 #include <string>
 #include <thread>
+#include "Database.h"
+#include "websocketService.h"
+#include <Configuration.h>
 
 
 
 
 int main() {
-    DataRobot date = {};
-    std::cout << "Hello, World!" << std::endl;
-
-    websocketService server_webSocket = websocketService("192.168.0.170", 8083);
-
+    Configuration config = Configuration("config.txt");
+    websocketService server_webSocket = websocketService("192.168.0.93", 8083);
     tcp::acceptor acceptor{server_webSocket.ioc, {server_webSocket.address, (unsigned short)server_webSocket.port}};
+    config.ReadSetting();
+
 
 
     try {
@@ -27,7 +27,6 @@ int main() {
             // Block until we get a connection
             acceptor.accept(socket);
 
-            // Launch the session, transferring ownership of the socket
             std::thread t1(&websocketService::process, std::move(socket));
             t1.detach();
         }

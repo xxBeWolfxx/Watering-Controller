@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.23)
 project(DaemonRPi)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 
 add_subdirectory(libs)
 add_subdirectory(main-program)
@@ -9,7 +9,8 @@ add_subdirectory(main-program)
 
 set(Boost_INCLUDE_DIR /usr/include/boost)
 include_directories(${Boost_INCLUDE_DIR})
-find_package(Boost COMPONENTS system filesystem REQUIRED)
+find_package(Boost REQUIRED COMPONENTS system filesystem json)
+set(Boost_USE_STATIC_LIBS ON)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)

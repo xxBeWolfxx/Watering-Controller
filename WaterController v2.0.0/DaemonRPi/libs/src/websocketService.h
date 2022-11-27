@@ -7,9 +7,13 @@
 
 #include <boost/beast/core.hpp>
 #include <boost/beast/websocket.hpp>
+#include <boost/json.hpp>
 #include <iostream>
 #include <string>
 #include <thread>
+
+
+
 // g++ -I /usr/include/boost -pthread websocket.cpp
 namespace beast = boost::beast;         // from <boost/beast.hpp>
 namespace http = beast::http;           // from <boost/beast/http.hpp>
