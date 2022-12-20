@@ -7,7 +7,7 @@ add_subdirectory(libs)
 add_subdirectory(main-program)
 
 
-set(Boost_INCLUDE_DIR /usr/include/boost)
+set(Boost_INCLUDE_DIR /usr/lib/cmake/Boost-1.80.0)
 include_directories(${Boost_INCLUDE_DIR})
 find_package(Boost REQUIRED COMPONENTS system filesystem json)
 set(Boost_USE_STATIC_LIBS ON)

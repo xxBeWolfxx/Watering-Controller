@@ -12,7 +12,7 @@ websocketService::websocketService(std::string ipAddress, uint32_t port) {
 
 }
 
-void websocketService::process(tcp::socket socket) {
+void websocketService::process(websocketService *instance, tcp::socket socket) {
     try
     {
         // Construct the stream by moving in the socket
@@ -41,7 +41,43 @@ void websocketService::process(tcp::socket socket) {
             ws.text(ws.got_text());
             auto text = net::buffer("TEST");
             ws.write(text);
+            instance->test();
+
         }
+    }
+
+    catch(std::exception const& e)
+    {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+
+
+}
+
+void websocketService::test() {
+    std::cout << "TESTcik" << std::endl;
+}
+
+void websocketService::handshake() {
+
+    try {
+        this->acceptor = new tcp::acceptor{this->ioc, {this->address, (unsigned short)this->port}};
+        this->socket = new tcp::socket{this->ioc};
+
+        // Block until we get a connection
+        acceptor->accept(*socket);
+
+        this->ws = new websocket::stream<tcp::socket>{std::move(*socket)};
+        this->ws->set_option(websocket::stream_base::decorator(
+                [](websocket::response_type& res)
+                {
+                    res.set(http::field::server,
+                            std::string(BOOST_BEAST_VERSION_STRING) +
+                            " websocket-server-sync");
+                }));
+
+        // Accept the websocket handshake
+        this->ws->accept();
     }
     catch(beast::system_error const& se)
     {
@@ -52,6 +88,30 @@ void websocketService::process(tcp::socket socket) {
     catch(std::exception const& e)
     {
         std::cerr << "Error: " << e.what() << std::endl;
+    }
+
+
+}
+
+void websocketService::process() {
+
+    try{
+        beast::flat_buffer buffer;
+
+        // Read a message
+        this->ws->read(buffer);
+        // Echo the message back
+        this->ws->text(ws->got_text());
+        auto text = net::buffer("TEST");
+        this->ws->write(text);
+        this->test();
+    }
+
+    catch(beast::system_error const& se)
+    {
+        // This indicates that the session was closed
+        if(se.code() != websocket::error::closed)
+            std::cerr << "Error: " << se.code().message() << std::endl;
     }
 
 }

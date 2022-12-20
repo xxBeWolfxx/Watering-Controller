@@ -22,15 +22,25 @@ namespace net = boost::asio;            // from <boost/asio.hpp>
 using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 
 class websocketService {
+private:
+    websocket::stream<tcp::socket> *ws;
+    tcp::socket *socket;
+    tcp::acceptor *acceptor;
+
 
 public:
     net::io_context ioc{1};
     net::ip::address address = {};
     uint32_t port;
 
+
     websocketService(std::string ipAddress, uint32_t port);
 
-    static void process(tcp::socket socket);
+    static void process(websocketService *websocket, tcp::socket socket);
+    void process();
+    void handshake();
+    void test();
+
 
 };
 

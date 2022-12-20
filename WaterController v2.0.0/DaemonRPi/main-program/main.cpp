@@ -4,39 +4,29 @@
 #include <iostream>
 #include <string>
 #include <thread>
+#include <cstdint>
 #include "Database.h"
 #include "websocketService.h"
 #include <Configuration.h>
+
+using namespace std;
 
 
 
 
 int main() {
     Configuration config = Configuration("config.txt");
-    websocketService server_webSocket = websocketService("192.168.0.93", 8083);
-    tcp::acceptor acceptor{server_webSocket.ioc, {server_webSocket.address, (unsigned short)server_webSocket.port}};
+    websocketService server_webSocket = websocketService("192.168.0.170", 8083);
     config.ReadSetting();
+    uint8_t status = 1;
 
+    server_webSocket.handshake();
 
-
-    try {
-
-        for (;;) {
-            tcp::socket socket{server_webSocket.ioc};
-
-            // Block until we get a connection
-            acceptor.accept(socket);
-
-            std::thread t1(&websocketService::process, std::move(socket));
-            t1.detach();
-        }
-
+    while(true){
+        server_webSocket.process();
     }
-    catch (const std::exception& e)
-    {
-        std::cerr << "Error: " << e.what() << std::endl;
-        return EXIT_FAILURE;
-    }
+
+
 
     return 0;
 }
