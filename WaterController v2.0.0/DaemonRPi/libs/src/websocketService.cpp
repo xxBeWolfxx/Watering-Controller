@@ -12,47 +12,6 @@ websocketService::websocketService(std::string ipAddress, uint32_t port) {
 
 }
 
-void websocketService::process(websocketService *instance, tcp::socket socket) {
-    try
-    {
-        // Construct the stream by moving in the socket
-        websocket::stream<tcp::socket> ws{std::move(socket)};
-
-        // Set a decorator to change the Server of the handshake
-        ws.set_option(websocket::stream_base::decorator(
-                [](websocket::response_type& res)
-                {
-                    res.set(http::field::server,
-                            std::string(BOOST_BEAST_VERSION_STRING) +
-                            " websocket-server-sync");
-                }));
-
-        // Accept the websocket handshake
-        ws.accept();
-
-        for(;;)
-        {
-            // This buffer will hold the incoming message
-            beast::flat_buffer buffer;
-
-            // Read a message
-            ws.read(buffer);
-            // Echo the message back
-            ws.text(ws.got_text());
-            auto text = net::buffer("TEST");
-            ws.write(text);
-            instance->test();
-
-        }
-    }
-
-    catch(std::exception const& e)
-    {
-        std::cerr << "Error: " << e.what() << std::endl;
-    }
-
-
-}
 
 void websocketService::test() {
     std::cout << "TESTcik" << std::endl;
@@ -78,6 +37,7 @@ void websocketService::handshake() {
 
         // Accept the websocket handshake
         this->ws->accept();
+        this->state = true;
     }
     catch(beast::system_error const& se)
     {
@@ -93,27 +53,45 @@ void websocketService::handshake() {
 
 }
 
-void websocketService::process() {
+void websocketService::process(websocketService *websocket) {
 
-    try{
-        beast::flat_buffer buffer;
+    while(websocket->state){
+        try{
+            beast::flat_buffer buffer;
 
-        // Read a message
-        this->ws->read(buffer);
-        // Echo the message back
-        this->ws->text(ws->got_text());
-        auto text = net::buffer("TEST");
-        this->ws->write(text);
-        this->test();
+            // Read a message
+            websocket->ws->read(buffer);
+            // Echo the message back
+            websocket->ws->text(websocket->ws->got_text());
+            auto text = net::buffer("TEST");
+            websocket->ws->write(text);
+            websocket->test();
+        }
+
+        catch(beast::system_error const& se)
+        {
+            // This indicates that the session was closed
+            if(se.code() != websocket::error::closed)
+                std::cerr << "Error: " << se.code().message() << " ### " << std::endl;
+            websocket->state = false;
+        }
+        catch(std::exception const& e)
+        {
+            std::cerr << "Error: " << e.what() << std::endl;
+        }
     }
+    std::cout << "KUPA" << std::endl;
 
-    catch(beast::system_error const& se)
-    {
-        // This indicates that the session was closed
-        if(se.code() != websocket::error::closed)
-            std::cerr << "Error: " << se.code().message() << std::endl;
-    }
 
+
+}
+
+void websocketService::setState(bool status) {
+    this->state = status;
+}
+
+bool websocketService::getState() {
+    return this->state;
 }
 
 

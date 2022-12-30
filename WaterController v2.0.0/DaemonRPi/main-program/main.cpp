@@ -17,15 +17,18 @@ using namespace std;
 int main() {
     Configuration config = Configuration("config.txt");
     websocketService server_webSocket = websocketService("192.168.0.170", 8083);
+
+
     config.ReadSetting();
     uint8_t status = 1;
 
     server_webSocket.handshake();
+    thread taskWebsocket(&websocketService::process, &server_webSocket);
+    taskWebsocket.detach();
 
-    while(true){
-        server_webSocket.process();
+    while(1){
+        int x = 1;
     }
-
 
 
     return 0;

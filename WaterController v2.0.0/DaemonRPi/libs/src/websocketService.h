@@ -12,9 +12,6 @@
 #include <string>
 #include <thread>
 
-
-
-// g++ -I /usr/include/boost -pthread websocket.cpp
 namespace beast = boost::beast;         // from <boost/beast.hpp>
 namespace http = beast::http;           // from <boost/beast/http.hpp>
 namespace websocket = beast::websocket; // from <boost/beast/websocket.hpp>
@@ -26,6 +23,7 @@ private:
     websocket::stream<tcp::socket> *ws;
     tcp::socket *socket;
     tcp::acceptor *acceptor;
+    bool state;
 
 
 public:
@@ -36,8 +34,10 @@ public:
 
     websocketService(std::string ipAddress, uint32_t port);
 
-    static void process(websocketService *websocket, tcp::socket socket);
-    void process();
+    void setState(bool status);
+    bool getState();
+
+    static void process(websocketService *websocket);
     void handshake();
     void test();
 
