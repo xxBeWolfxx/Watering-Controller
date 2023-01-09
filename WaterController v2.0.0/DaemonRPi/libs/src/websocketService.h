@@ -18,31 +18,42 @@ namespace websocket = beast::websocket; // from <boost/beast/websocket.hpp>
 namespace net = boost::asio;            // from <boost/asio.hpp>
 using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 
-class websocketService {
+class websocketService : public std::enable_shared_from_this<websocketService>{
 private:
-    websocket::stream<tcp::socket> *ws;
-    tcp::socket *socket;
-    tcp::acceptor *acceptor;
+    websocket::stream<tcp::socket> ws;
+    beast::flat_buffer buffer;
+
     bool state;
 
 
 public:
-    net::io_context ioc{1};
+
     net::ip::address address = {};
     uint32_t port;
 
 
-    websocketService(std::string ipAddress, uint32_t port);
+    websocketService(tcp::socket&& socket);
 
     void setState(bool status);
     bool getState();
 
-    static void process(websocketService *websocket);
-    void handshake();
+    void process();
+    void echo();
     void test();
 
 
 };
+
+class ListenerWebsocket : public std::enable_shared_from_this<ListenerWebsocket>{
+    net::io_context &ioc;
+    tcp::acceptor acceptor;
+
+public:
+    ListenerWebsocket(net::io_context& ioc, std::string ipAddress, unsigned short int port);
+    void asyncAccpet();
+
+};
+
 
 
 #endif //DAEMONRPI_WEBSOCKETSERVICE_H

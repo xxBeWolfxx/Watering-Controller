@@ -16,19 +16,19 @@ using namespace std;
 
 int main() {
     Configuration config = Configuration("config.txt");
-    websocketService server_webSocket = websocketService("192.168.0.170", 8083);
+//    websocketService server_webSocket = websocketService("192.168.0.170", 8083);
 
 
     config.ReadSetting();
-    uint8_t status = 1;
+    auto const port = 8083;
+    net::io_context ioc{};
 
-    server_webSocket.handshake();
-    thread taskWebsocket(&websocketService::process, &server_webSocket);
-    taskWebsocket.detach();
+    auto test = std::make_shared<ListenerWebsocket>(ioc, "192.168.0.170",port);
 
-    while(1){
-        int x = 1;
-    }
+    test->asyncAccpet();
+
+    ioc.run();
+
 
 
     return 0;

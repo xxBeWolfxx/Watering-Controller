@@ -4,11 +4,7 @@
 
 #include "websocketService.h"
 
-websocketService::websocketService(std::string ipAddress, uint32_t port) {
-
-    this->address = net::ip::make_address(ipAddress);
-    this->port = port;
-
+websocketService::websocketService(tcp::socket&& socket) : ws(std::move(socket)) {
 
 }
 
@@ -17,73 +13,15 @@ void websocketService::test() {
     std::cout << "TESTcik" << std::endl;
 }
 
-void websocketService::handshake() {
+void websocketService::process() {
 
-    try {
-        this->acceptor = new tcp::acceptor{this->ioc, {this->address, (unsigned short)this->port}};
-        this->socket = new tcp::socket{this->ioc};
+    ws.async_accept(
+            [self{shared_from_this()}](beast::error_code ec){
 
-        // Block until we get a connection
-        acceptor->accept(*socket);
+                if(ec){ std::cout << ec.message() << "\n"; return;}
 
-        this->ws = new websocket::stream<tcp::socket>{std::move(*socket)};
-        this->ws->set_option(websocket::stream_base::decorator(
-                [](websocket::response_type& res)
-                {
-                    res.set(http::field::server,
-                            std::string(BOOST_BEAST_VERSION_STRING) +
-                            " websocket-server-sync");
-                }));
-
-        // Accept the websocket handshake
-        this->ws->accept();
-        this->state = true;
-    }
-    catch(beast::system_error const& se)
-    {
-        // This indicates that the session was closed
-        if(se.code() != websocket::error::closed)
-            std::cerr << "Error: " << se.code().message() << std::endl;
-    }
-    catch(std::exception const& e)
-    {
-        std::cerr << "Error: " << e.what() << std::endl;
-    }
-
-
-}
-
-void websocketService::process(websocketService *websocket) {
-
-    while(websocket->state){
-        try{
-            beast::flat_buffer buffer;
-
-            // Read a message
-            websocket->ws->read(buffer);
-            // Echo the message back
-            websocket->ws->text(websocket->ws->got_text());
-            auto text = net::buffer("TEST");
-            websocket->ws->write(text);
-            websocket->test();
-        }
-
-        catch(beast::system_error const& se)
-        {
-            // This indicates that the session was closed
-            if(se.code() != websocket::error::closed)
-                std::cerr << "Error: " << se.code().message() << " ### " << std::endl;
-            websocket->state = false;
-        }
-        catch(std::exception const& e)
-        {
-            std::cerr << "Error: " << e.what() << std::endl;
-        }
-    }
-    std::cout << "KUPA" << std::endl;
-
-
-
+                self->echo();
+            });
 }
 
 void websocketService::setState(bool status) {
@@ -94,5 +32,44 @@ bool websocketService::getState() {
     return this->state;
 }
 
+void websocketService::echo() {
+    ws.async_read(
+            buffer,
+            [self{shared_from_this()}](beast::error_code ec, std::size_t bytes_transferred)
+            {
+                if(ec == websocket::error::closed)
+                    return;
+
+                if(ec){ std::cout << ec.message() << "\n"; return;}
+
+                auto out = beast::buffers_to_string(self->buffer.cdata());
+                std::cout<<out<<" "<<std::flush;
+                self->ws.async_write(
+                        self->buffer.data(),
+                        [self](beast::error_code ec, std::size_t bytes_transferred)
+                        {
+
+                            if(ec){ std::cout << ec.message() << "\n"; return;}
+
+                            self->buffer.consume(self->buffer.size());
+
+                            self->echo();
+                        });
+            });
+}
 
 
+
+ListenerWebsocket::ListenerWebsocket(net::io_context &ioc, std::string ipAddress, unsigned short port) :
+        ioc(ioc), acceptor(ioc, {net::ip::make_address(ipAddress), port}){
+
+}
+
+void ListenerWebsocket::asyncAccpet() {
+    acceptor.async_accept(ioc, [self{shared_from_this()}](boost::system::error_code ec, tcp::socket socket){
+        std::make_shared<websocketService>(std::move(socket))->process();
+        self->asyncAccpet();
+
+    });
+
+}
