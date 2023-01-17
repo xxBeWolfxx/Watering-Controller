@@ -12,7 +12,7 @@
 using namespace std;
 
 
-
+int websocketService::id = 0;
 
 int main() {
     Configuration config = Configuration("config.txt");
@@ -23,7 +23,7 @@ int main() {
     auto const port = 8083;
     net::io_context ioc{};
 
-    auto test = std::make_shared<ListenerWebsocket>(ioc, "192.168.0.170",port);
+    auto test = std::make_shared<ListenerWebsocket>(ioc, "127.0.0.1",port);
 
     test->asyncAccpet();
 

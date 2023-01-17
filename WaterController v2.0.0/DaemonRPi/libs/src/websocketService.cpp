@@ -4,8 +4,10 @@
 
 #include "websocketService.h"
 
-websocketService::websocketService(tcp::socket&& socket) : ws(std::move(socket)) {
 
+
+websocketService::websocketService(tcp::socket&& socket) : ws(std::move(socket)) {
+    id++;
 }
 
 
@@ -37,8 +39,11 @@ void websocketService::echo() {
             buffer,
             [self{shared_from_this()}](beast::error_code ec, std::size_t bytes_transferred)
             {
-                if(ec == websocket::error::closed)
+                if(ec == websocket::error::closed){
+                    self->ws.close(beast::websocket::close_code::normal, ec);
                     return;
+                }
+
 
                 if(ec){ std::cout << ec.message() << "\n"; return;}
 
@@ -67,7 +72,9 @@ ListenerWebsocket::ListenerWebsocket(net::io_context &ioc, std::string ipAddress
 
 void ListenerWebsocket::asyncAccpet() {
     acceptor.async_accept(ioc, [self{shared_from_this()}](boost::system::error_code ec, tcp::socket socket){
-        std::make_shared<websocketService>(std::move(socket))->process();
+        auto ptr = std::make_shared<websocketService>(std::move(socket));
+        self->ptrVector.push_back(ptr);
+        ptr->process();
         self->asyncAccpet();
 
     });

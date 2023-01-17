@@ -28,6 +28,7 @@ int Database::callback(void *NotUsed, int argc, char **argv, char **azColName) {
     temp.coordinate = std::string(argv[1]);
     sscanf(argv[2], "%d", &temp.timestamp);
 //    vData.push_back(temp);
+    return 0;
 
 }
 
