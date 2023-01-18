@@ -6,30 +6,39 @@
 #include <thread>
 #include <cstdint>
 #include "Database.h"
-#include "websocketService.h"
+#include "WebsocketService.h"
 #include <Configuration.h>
 
 using namespace std;
 
+void websocketTask(net::io_context *ioc){
+    sleep(1);
+    ioc->run();
+}
 
-int websocketService::id = 0;
 
 int main() {
     Configuration config = Configuration("config.txt");
-//    websocketService server_webSocket = websocketService("192.168.0.170", 8083);
+    net::io_context ioc{};
+    std::thread taskWebsocketDeamon (websocketTask, &ioc);
+//    WebsocketService server_webSocket = WebsocketService("192.168.0.170", 8083);
 
 
     config.ReadSetting();
     auto const port = 8083;
-    net::io_context ioc{};
+
 
     auto test = std::make_shared<ListenerWebsocket>(ioc, "127.0.0.1",port);
 
     test->asyncAccpet();
 
-    ioc.run();
+    taskWebsocketDeamon.detach();
 
 
+
+    for(;;){
+
+    }
 
     return 0;
 }
