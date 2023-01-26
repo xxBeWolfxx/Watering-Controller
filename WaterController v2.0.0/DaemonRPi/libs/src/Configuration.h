@@ -12,7 +12,7 @@ using namespace std;
 
 struct settings{
     string ipAddress;
-    uint32_t port;
+    unsigned short port;
 };
 
 

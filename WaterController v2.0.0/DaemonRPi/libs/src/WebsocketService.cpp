@@ -8,11 +8,7 @@
 
 WebsocketService::WebsocketService(tcp::socket&& socket) : ws(std::move(socket)) {
     this->state = true;
-}
-
-
-void WebsocketService::test() {
-    std::cout << "TESTcik" << std::endl;
+    this->new_message_appeared = false;
 }
 
 void WebsocketService::process() {
@@ -39,43 +35,68 @@ bool WebsocketService::getState() {
 
 void WebsocketService::echo() {
 
-    ws.async_read(
-            buffer,
-            [self{shared_from_this()}](beast::error_code ec, std::size_t bytes_transferred)
-            {
-                if(ec == websocket::error::closed){
-                    self->state = false;
-                    self->ws.close(beast::websocket::close_code::normal, ec);
-                    return;
-                }
+    while(this->new_message_appeared){
+
+    }
+
+        ws.async_read(
+                buffer,
+                [self{shared_from_this()}](beast::error_code ec, std::size_t bytes_transferred)
+                {
+                    if(ec == websocket::error::closed){
+                        self->state = false;
+                        self->ws.close(beast::websocket::close_code::normal, ec);
+                        return;
+                    }
+
+                    if(ec){
+                        self->state = false;
+                        std::cout << ec.message() << "\n"; return;
+                    }
+
+                    std::string out = beast::buffers_to_string(self->buffer.cdata());
+                    std::cout<<out<<" "<<std::flush;
+                    self->buffer.consume(self->buffer.size());
+
+                    self->new_message_appeared = true;
+
+                    self->asy_write("{\"Status\":\"OK\"}");
+
+                    self->echo();
+
+                });
 
 
-                if(ec){
-                    self->state = false;
-                    std::cout << ec.message() << "\n"; return;
-                }
 
-                auto out = beast::buffers_to_string(self->buffer.cdata());
-                std::cout<<out<<" "<<std::flush;
-                self->ws.async_write(
-                        self->buffer.data(),
-                        [self](beast::error_code ec, std::size_t bytes_transferred)
-                        {
 
-                            if(ec){
-                                self->state = false;
-                                std::cout << ec.message() << "\n"; return;
-                            }
-
-                            self->buffer.consume(self->buffer.size());
-
-                            self->echo();
-                        });
-            });
 }
 
 WebsocketService::~WebsocketService() {
     std::cout << "DELETING" << std::endl;
+}
+
+void WebsocketService::asy_write(std::string msg) {
+    this->ws.async_write(
+            net::buffer(msg),
+            [this](beast::error_code ec, std::size_t bytes_transferred)
+            {
+
+                if(ec){
+                    this->state = false;
+                    std::cout << ec.message() << "\n"; return;
+                }
+
+
+            });
+}
+
+std::string WebsocketService::getContent() {
+    return this->content;
+}
+
+void WebsocketService::sy_write(std::string msg) {
+    this->ws.write(net::buffer(msg));
+
 }
 
 
@@ -89,7 +110,6 @@ void ListenerWebsocket::asyncAccpet() {
         auto ptr = std::make_shared<WebsocketService>(std::move(socket));
         self->ptrVector.push_back(ptr);
         ptr->process();
-        self->checkAllPointers();
         self->asyncAccpet();
 
     });
@@ -97,12 +117,13 @@ void ListenerWebsocket::asyncAccpet() {
 
 }
 
-void ListenerWebsocket::checkAllPointers() {
+void ListenerWebsocket::check_all_pointers() {
     std::vector<uint8_t> positionOfItem;
     bool itemFound = false;
     uint8_t iterator = 0;
     for ( std::shared_ptr<WebsocketService> ptr : this->ptrVector){
-        auto item = ptr.get();
+        WebsocketService *item = ptr.get();
+
         if(!item->getState()){
             ptr.reset();
             ptr = nullptr;
@@ -119,4 +140,15 @@ void ListenerWebsocket::checkAllPointers() {
         }
     }
 
+}
+
+void ListenerWebsocket::get_all_messages(std::vector<std::string> &payload) {
+    for(std::shared_ptr<WebsocketService> ptr : this->ptrVector){
+        WebsocketService *item = ptr.get();
+
+        if(item->new_message_appeared){
+            payload.push_back(item->getContent());
+            item->new_message_appeared = false;
+        }
+    }
 }

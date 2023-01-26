@@ -19,10 +19,6 @@ namespace websocket = beast::websocket; // from <boost/beast/websocket.hpp>
 namespace net = boost::asio;            // from <boost/asio.hpp>
 using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 
-struct Payload{
-    std::string content;
-    uint8_t status;
-};
 
 
 class WebsocketService : public std::enable_shared_from_this<WebsocketService>{
@@ -31,12 +27,14 @@ private:
     beast::flat_buffer buffer;
 
     bool state;
+    std::string content;
 
 
 public:
     net::ip::address address = {};
     uint32_t port;
-    Payload payload;
+
+    bool new_message_appeared;
 
 
     WebsocketService(tcp::socket&& socket);
@@ -44,10 +42,12 @@ public:
 
     void setState(bool status);
     bool getState();
+    std::string getContent();
 
     void process();
     void echo();
-    void test();
+    void asy_write(std::string msg);
+    void sy_write(std::string msg);
 
 
 };
@@ -62,7 +62,11 @@ public:
     std::vector<std::shared_ptr<WebsocketService>> ptrVector;
     ListenerWebsocket(net::io_context& ioc, std::string ipAddress, unsigned short int port);
     void asyncAccpet();
-    void checkAllPointers();
+
+    void check_all_pointers();
+    void get_all_messages(std::vector<std::string> &payload);
+
+
 
 };
 

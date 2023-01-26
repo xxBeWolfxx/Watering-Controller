@@ -11,8 +11,8 @@
 
 using namespace std;
 
-void websocketTask(net::io_context *ioc){
-    sleep(1);
+void websocketTask(net::io_context *ioc) {
+    sleep(2);
     ioc->run();
 }
 
@@ -20,23 +20,32 @@ void websocketTask(net::io_context *ioc){
 int main() {
     Configuration config = Configuration("config.txt");
     net::io_context ioc{};
-    std::thread taskWebsocketDeamon (websocketTask, &ioc);
-//    WebsocketService server_webSocket = WebsocketService("192.168.0.170", 8083);
-
+    std::thread taskWebsocketDeamon(websocketTask, &ioc);
 
     config.ReadSetting();
-    auto const port = 8083;
 
+    shared_ptr<ListenerWebsocket> ptr_ListenerWebsocket = std::make_shared<ListenerWebsocket>(ioc, "127.0.0.1",
+                                                                                              config.config.port);
+    ptr_ListenerWebsocket->asyncAccpet();
 
-    auto test = std::make_shared<ListenerWebsocket>(ioc, "127.0.0.1",port);
-
-    test->asyncAccpet();
+    ListenerWebsocket *listiener = ptr_ListenerWebsocket.get();
 
     taskWebsocketDeamon.detach();
 
+    std::uint8_t i = 0;
+
+    for (;;) {
+        if (i > 10) {
 
 
-    for(;;){
+            listiener->check_all_pointers();
+            i = 0;
+        }
+        vector<string> temp;
+
+        listiener->get_all_messages(temp);
+        sleep(1);
+        i++;
 
     }
 
