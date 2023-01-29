@@ -8,11 +8,11 @@
 #include <string>
 #include <vector>
 
-typedef struct DataRobot{
+typedef struct Flower{
     std::string name;
     std::string coordinate;
     int timestamp;
-}DataRobot;
+}Flower;
 
 
 class Database {
@@ -20,12 +20,12 @@ class Database {
 private:
     std::string filename;
     sqlite3 *db;
-    std::string dbName = "crawler";
+    std::string dbName = "flower";
 
 
 
 public:
-    std::vector<DataRobot> vData;
+    std::vector<Flower> vData;
 
 
     Database(std::string filename);
