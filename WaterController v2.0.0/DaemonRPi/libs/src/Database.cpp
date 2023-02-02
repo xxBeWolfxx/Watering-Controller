@@ -22,7 +22,7 @@ Database::Database() {
 }
 
 int Database::callback(void *NotUsed, int argc, char **argv, char **azColName) {
-    DataRobot temp;
+    Flower temp;
     temp.name = std::string(argv[0]);
     temp.coordinate = std::string(argv[1]);
     sscanf(argv[2], "%d", &temp.timestamp);
@@ -85,7 +85,7 @@ uint8_t Database::selectData() {
     sqlite3_prepare(this->db, record->c_str(), -1, &stmt, NULL);
     sqlite3_step(stmt);
     while (sqlite3_column_text(stmt, 0)){
-        DataRobot temp;
+        Flower temp;
         temp.name = std::string((char *) sqlite3_column_text(stmt, 0));
         temp.coordinate = std::string((char *) sqlite3_column_text(stmt, 1));
         sscanf((char *) sqlite3_column_text(stmt, 2), "%d", &temp.timestamp);
