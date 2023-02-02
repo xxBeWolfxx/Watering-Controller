@@ -8,32 +8,41 @@
 #include <string>
 #include <vector>
 
-typedef struct DataRobot{
+typedef struct Flower{
     std::string name;
     std::string coordinate;
     int timestamp;
-}DataRobot;
+}Flower;
 
 
 class Database {
 
 private:
-    std::string filename;
+    const std::string flower_table = "flowerTable";
+    const std::string measurements_table = "measurementsTable";
+
+
     sqlite3 *db;
-    std::string dbName = "crawler";
+    std::string dbName = "rpi.db";
 
 
 
 public:
-    std::vector<DataRobot> vData;
+    std::vector<Flower> vData;
 
 
-    Database(std::string filename);
+    Database();
     ~Database();
 
-    uint8_t openDatabase();
-    uint8_t insertData(std::string name, int16_t coordinates[], int timestamp);
+    uint8_t openDatabase(std::string database);
+    void closeDatabase(std::string database);
+    uint8_t insertData(std::string *command);
+    uint8_t getFlower(Flower object);
+
+
     uint8_t selectData();
+
+
 
     static int callback(void *NotUsed, int argc, char **argv, char **azColName);
 

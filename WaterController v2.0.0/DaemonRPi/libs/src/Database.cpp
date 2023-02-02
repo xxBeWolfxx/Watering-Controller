@@ -17,9 +17,8 @@ static int callback1(void *NotUsed, int argc, char **argv, char **azColName) {
 
 
 
-Database::Database(std::string filename) {
-    this->filename = filename;
-    this->openDatabase();
+Database::Database() {
+
 }
 
 int Database::callback(void *NotUsed, int argc, char **argv, char **azColName) {
@@ -32,9 +31,9 @@ int Database::callback(void *NotUsed, int argc, char **argv, char **azColName) {
 
 }
 
-uint8_t Database::openDatabase() {
+uint8_t Database::openDatabase(std::string database) {
     uint8_t rc = 0;
-    rc = sqlite3_open(this->filename.c_str(), &this->db);
+    rc = sqlite3_open(database.c_str(), &this->db);
     if( rc ) {
         fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(this->db));
         return 0;
@@ -47,18 +46,24 @@ uint8_t Database::openDatabase() {
 
 }
 
-uint8_t Database::insertData(std::string name, int16_t coordinates[], int timestamp){
-    std::string *record = new std::string();
-    char *zErrMsg = 0;
+void Database::closeDatabase(std::string database) {
 
-    std::string values = std::to_string(coordinates[0]) + ";"
-                         + std::to_string(coordinates[1]) + ";"
-                         + std::to_string(coordinates[2]);
-    *record = "INSERT INTO " + this->dbName
-              + "(NAME,COORDINATES,TIMESTAMP) VALUES ('" + name + "', '" + values + "', "
-              + std::to_string(timestamp) + ");";
+    sqlite3_close(this->db);
+}
 
-    int16_t rc = sqlite3_exec(this->db, record->c_str(), NULL, 0, &zErrMsg);
+
+uint8_t Database::insertData(std::string *command){ // int16_t coordinates[], int timestamp
+//    std::string *record = new std::string();
+//    char *zErrMsg = 0;
+
+//    std::string values = std::to_string(coordinates[0]) + ";"
+//                         + std::to_string(coordinates[1]) + ";"
+//                         + std::to_string(coordinates[2]);
+//    *record = "INSERT INTO " + this->dbName
+//              + "(NAME,COORDINATES,TIMESTAMP) VALUES ('" + name + "', '" + values + "', "
+//              + std::to_string(timestamp) + ");";
+
+    int16_t rc = sqlite3_exec(this->db, command->c_str(), NULL, 0, &zErrMsg);
 
     if( rc != SQLITE_OK ){
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
@@ -67,7 +72,7 @@ uint8_t Database::insertData(std::string name, int16_t coordinates[], int timest
         fprintf(stdout, "Records created successfully\n");
     }
 
-    delete record;
+//    delete record;
 
 }
 
@@ -93,6 +98,11 @@ uint8_t Database::selectData() {
 
 }
 
+
+
+
 Database::~Database() {
     sqlite3_close(db);
 }
+
+
