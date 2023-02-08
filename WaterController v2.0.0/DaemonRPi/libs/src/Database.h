@@ -37,10 +37,8 @@ public:
     uint8_t openDatabase(std::string database);
     void closeDatabase(std::string database);
     uint8_t insertData(std::string *command);
-    uint8_t getFlower(Flower object);
 
-
-    uint8_t selectData();
+    uint8_t selectData(std::string tableName);
 
 
 

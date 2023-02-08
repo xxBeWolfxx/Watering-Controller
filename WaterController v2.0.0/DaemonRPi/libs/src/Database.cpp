@@ -76,21 +76,31 @@ uint8_t Database::insertData(std::string *command){ // int16_t coordinates[], in
 
 }
 
-uint8_t Database::selectData() {
+uint8_t Database::selectData(std::string tableName) {
     std::string *record = new std::string();
     sqlite3_stmt *stmt;
-    *record = "SELECT * from crawler";
+    *record = "SELECT * from " + tableName;
+
+    std::string temp = "";
 
     /* Execute SQL statement */
     sqlite3_prepare(this->db, record->c_str(), -1, &stmt, NULL);
     sqlite3_step(stmt);
+    uint8_t columnNumber = sqlite3_column_count(stmt);
+
     while (sqlite3_column_text(stmt, 0)){
-        Flower temp;
-        temp.name = std::string((char *) sqlite3_column_text(stmt, 0));
-        temp.coordinate = std::string((char *) sqlite3_column_text(stmt, 1));
-        sscanf((char *) sqlite3_column_text(stmt, 2), "%d", &temp.timestamp);
-        this->vData.push_back(temp);
-        sqlite3_step(stmt);
+
+
+        for (uint8_t i; i < columnNumber; i++){
+            temp = temp + "{" + std::string((char *) sqlite3_column_text(stmt, i)) + "}";
+        }
+        temp = temp + "\n";
+
+
+//        temp.name = std::string((char *) sqlite3_column_text(stmt, 0));
+//        temp.coordinate = std::string((char *) sqlite3_column_text(stmt, 1));
+//        sscanf((char *) sqlite3_column_text(stmt, 2), "%d", &temp.timestamp);
+//        sqlite3_step(stmt);
     }
 
     sqlite3_finalize(stmt);
