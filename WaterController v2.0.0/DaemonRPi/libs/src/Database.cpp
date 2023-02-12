@@ -31,7 +31,7 @@ int Database::callback(void *NotUsed, int argc, char **argv, char **azColName) {
 
 }
 
-uint8_t Database::openDatabase(std::string database) {
+uint8_t Database::OpenDatabase(std::string database) {
     uint8_t rc = 0;
     rc = sqlite3_open(database.c_str(), &this->db);
     if( rc ) {
@@ -46,15 +46,15 @@ uint8_t Database::openDatabase(std::string database) {
 
 }
 
-void Database::closeDatabase(std::string database) {
+void Database::CloseDatabase(std::string database) {
 
     sqlite3_close(this->db);
 }
 
 
-uint8_t Database::insertData(std::string *command){ // int16_t coordinates[], int timestamp
+uint8_t Database::InsertData(std::string *command){ // int16_t coordinates[], int timestamp
 //    std::string *record = new std::string();
-//    char *zErrMsg = 0;
+    char *zErrMsg = 0;
 
 //    std::string values = std::to_string(coordinates[0]) + ";"
 //                         + std::to_string(coordinates[1]) + ";"
@@ -76,7 +76,7 @@ uint8_t Database::insertData(std::string *command){ // int16_t coordinates[], in
 
 }
 
-uint8_t Database::selectData(std::string tableName) {
+uint8_t Database::Select_all_data(std::string tableName, std::vector<std::string> &data) {
     std::string *record = new std::string();
     sqlite3_stmt *stmt;
     *record = "SELECT * from " + tableName;
@@ -91,16 +91,16 @@ uint8_t Database::selectData(std::string tableName) {
     while (sqlite3_column_text(stmt, 0)){
 
 
-        for (uint8_t i; i < columnNumber; i++){
+        for (uint8_t i = 0; i < columnNumber; i++){
             temp = temp + "{" + std::string((char *) sqlite3_column_text(stmt, i)) + "}";
         }
-        temp = temp + "\n";
-
+        data.push_back(temp);
+        temp = "";
 
 //        temp.name = std::string((char *) sqlite3_column_text(stmt, 0));
 //        temp.coordinate = std::string((char *) sqlite3_column_text(stmt, 1));
 //        sscanf((char *) sqlite3_column_text(stmt, 2), "%d", &temp.timestamp);
-//        sqlite3_step(stmt);
+        sqlite3_step(stmt);
     }
 
     sqlite3_finalize(stmt);
@@ -114,5 +114,11 @@ uint8_t Database::selectData(std::string tableName) {
 Database::~Database() {
     sqlite3_close(db);
 }
+
+/*
+ * ID esp32 {
+ *
+ *
+ */
 
 

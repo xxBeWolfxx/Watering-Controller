@@ -30,22 +30,28 @@ int main() {
 
     taskWebsocketDeamon.detach();
 
+    vector<string> data;
+
+    Database database = Database();
+    database.OpenDatabase("rpi.db");
+    database.Select_all_data("ESP", data);
+
 
     //TESTING PART
     std::uint8_t i = 0;
 
     for (;;) {
-        if (i > 10) {
-
-
-            listiener->check_all_pointers();
-            i = 0;
-        }
-        vector<string> temp;
-
-        listiener->get_all_messages(temp);
-        sleep(1);
-        i++;
+//        if (i > 10) {
+//
+//
+//            listiener->check_all_pointers();
+//            i = 0;
+//        }
+//        vector<string> temp;
+//
+//        listiener->get_all_messages(temp);
+//        sleep(1);
+//        i++;
 
     }
 

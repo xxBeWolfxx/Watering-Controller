@@ -34,12 +34,11 @@ public:
     Database();
     ~Database();
 
-    uint8_t openDatabase(std::string database);
-    void closeDatabase(std::string database);
-    uint8_t insertData(std::string *command);
+    uint8_t OpenDatabase(std::string database);
+    void CloseDatabase(std::string database);
+    uint8_t InsertData(std::string *command);
 
-    uint8_t selectData(std::string tableName);
-
+    uint8_t Select_all_data(std::string tableName, std::vector<std::string> &data);
 
 
     static int callback(void *NotUsed, int argc, char **argv, char **azColName);
