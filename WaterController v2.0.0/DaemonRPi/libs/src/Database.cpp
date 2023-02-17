@@ -14,6 +14,28 @@ static int callback1(void *NotUsed, int argc, char **argv, char **azColName) {
     return 0;
 }
 
+static uint16_t countWords(std::string str, char separator){
+    if (str.size() == 0) {
+        return 0;
+    }
+
+    uint16_t count = 1;
+
+    for (uint16_t i = 0; i < str.size(); i++) {
+
+        if (str[i] == separator) {
+            count++;
+        }
+
+    }
+
+
+
+
+
+    return count;
+}
+
 
 
 
@@ -52,18 +74,15 @@ void Database::CloseDatabase(std::string database) {
 }
 
 
-uint8_t Database::InsertData(std::string *command){ // int16_t coordinates[], int timestamp
-//    std::string *record = new std::string();
+uint8_t Database::InsertData(std::string *table, std::string *columns, std::string *value){ // int16_t coordinates[], int timestamp
+
+
+    std::string *record = new std::string();
     char *zErrMsg = 0;
 
-//    std::string values = std::to_string(coordinates[0]) + ";"
-//                         + std::to_string(coordinates[1]) + ";"
-//                         + std::to_string(coordinates[2]);
-//    *record = "INSERT INTO " + this->dbName
-//              + "(NAME,COORDINATES,TIMESTAMP) VALUES ('" + name + "', '" + values + "', "
-//              + std::to_string(timestamp) + ");";
+    *record = "INSERT INTO " + *table + " (" + *columns + ") VALUES (" + *value + ");";
 
-    int16_t rc = sqlite3_exec(this->db, command->c_str(), NULL, 0, &zErrMsg);
+    int16_t rc = sqlite3_exec(this->db, record->c_str(), NULL, 0, &zErrMsg);
 
     if( rc != SQLITE_OK ){
         fprintf(stderr, "SQL error: %s\n", zErrMsg);
@@ -72,19 +91,35 @@ uint8_t Database::InsertData(std::string *command){ // int16_t coordinates[], in
         fprintf(stdout, "Records created successfully\n");
     }
 
-//    delete record;
+    delete record;
 
 }
 
 uint8_t Database::Select_all_data(std::string tableName, std::vector<std::string> &data) {
     std::string *record = new std::string();
-    sqlite3_stmt *stmt;
     *record = "SELECT * from " + tableName;
 
+    this->SelectData(record, data);
+
+
+    delete record;
+
+}
+
+
+
+
+Database::~Database() {
+    sqlite3_close(db);
+}
+
+uint8_t Database::SelectData(std::string *command, std::vector<std::string> &data) {
+
+    sqlite3_stmt *stmt;
     std::string temp = "";
 
     /* Execute SQL statement */
-    sqlite3_prepare(this->db, record->c_str(), -1, &stmt, NULL);
+    sqlite3_prepare(this->db, command->c_str(), -1, &stmt, NULL);
     sqlite3_step(stmt);
     uint8_t columnNumber = sqlite3_column_count(stmt);
 
@@ -96,23 +131,12 @@ uint8_t Database::Select_all_data(std::string tableName, std::vector<std::string
         }
         data.push_back(temp);
         temp = "";
-
-//        temp.name = std::string((char *) sqlite3_column_text(stmt, 0));
-//        temp.coordinate = std::string((char *) sqlite3_column_text(stmt, 1));
-//        sscanf((char *) sqlite3_column_text(stmt, 2), "%d", &temp.timestamp);
         sqlite3_step(stmt);
     }
 
     sqlite3_finalize(stmt);
-    delete record;
 
-}
-
-
-
-
-Database::~Database() {
-    sqlite3_close(db);
+    return 0;
 }
 
 /*

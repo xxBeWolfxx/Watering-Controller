@@ -34,7 +34,7 @@ int main() {
 
     Database database = Database();
     database.OpenDatabase("rpi.db");
-    database.Select_all_data("ESP", data);
+    database.Select_all_data("PLANT", data);
 
 
     //TESTING PART

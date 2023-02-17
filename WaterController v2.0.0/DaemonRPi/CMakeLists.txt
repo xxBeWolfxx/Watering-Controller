@@ -5,6 +5,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 
 add_subdirectory(libs)
 add_subdirectory(main-program)
+add_subdirectory(tests)
 
 
 set(Boost_INCLUDE_DIR /usr/lib/cmake/Boost-1.80.0)
