@@ -14,7 +14,7 @@ static int callback1(void *NotUsed, int argc, char **argv, char **azColName) {
     return 0;
 }
 
-static uint16_t countWords(std::string str, char separator){
+uint16_t Database::countWords(std::string str, char separator){
     if (str.size() == 0) {
         return 0;
     }
@@ -28,10 +28,6 @@ static uint16_t countWords(std::string str, char separator){
         }
 
     }
-
-
-
-
 
     return count;
 }

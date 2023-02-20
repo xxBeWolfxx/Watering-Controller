@@ -6,29 +6,26 @@
 #define BOOST_TEST_MODULE Tests
 
 #include <boost/test/included/unit_test.hpp>
+#include <sqlite3.h>
 #include "Database.h"
 
-static uint16_t countWords(std::string str, char separator){
-    if (str.size() == 0) {
-        return 0;
-    }
-
-    uint16_t count = 1;
-
-    for (uint16_t i = 0; i < str.size(); i++) {
-
-        if (str[i] == separator) {
-            count++;
-        }
-
-    }
-
-    return count;
-}
-
+BOOST_AUTO_TEST_SUITE(DATABASE);
 
 BOOST_AUTO_TEST_CASE(stringCheck){
 
-    BOOST_CHECK(countWords("Andrzej POKA ROR", ' ') == 3);
+
+    Flower x1 = {};
+    x1.timestamp = 1;
+
+    uint16_t count = Database::countWords("DD XX", ' ');
+
+    BOOST_CHECK(count == 2);
 
 }
+
+BOOST_AUTO_TEST_CASE(nextTest){
+    BOOST_CHECK(1 == 1);
+}
+
+BOOST_AUTO_TEST_SUITE_END();
+

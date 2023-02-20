@@ -14,7 +14,6 @@ typedef struct Flower{
     int timestamp;
 }Flower;
 
-
 class Database {
 
 private:
@@ -43,6 +42,7 @@ public:
 
 
     static int callback(void *NotUsed, int argc, char **argv, char **azColName);
+    static uint16_t countWords(std::string str, char separator);
 
 };
 
