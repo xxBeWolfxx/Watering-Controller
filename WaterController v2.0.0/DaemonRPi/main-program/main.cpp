@@ -7,7 +7,8 @@
 #include <cstdint>
 #include "Database.h"
 #include "WebsocketService.h"
-#include <Configuration.h>
+#include "Record.h"
+#include "Configuration.h"
 
 using namespace std;
 
@@ -25,35 +26,70 @@ int main() {
     std::thread taskWebsocketDeamon(websocketTask, &ioc);
 
     shared_ptr<ListenerWebsocket> ptr_ListenerWebsocket = std::make_shared<ListenerWebsocket>(ioc, "127.0.0.1",config.config.port);
-    ptr_ListenerWebsocket->asyncAccpet();
     ListenerWebsocket *listiener = ptr_ListenerWebsocket.get();
 
-    taskWebsocketDeamon.detach();
+
 
     vector<string> data;
 
     Database database = Database();
-    database.OpenDatabase("rpi.db");
-    database.Select_all_data("PLANT", data);
+
+//    database.Select_all_data("PLANT", data);
+
+    ESP_unit esp = ESP_unit(&database, 101);
 
 
-    //TESTING PART
-    std::uint8_t i = 0;
 
-    for (;;) {
-//        if (i > 10) {
-//
-//
-//            listiener->check_all_pointers();
-//            i = 0;
-//        }
-//        vector<string> temp;
-//
-//        listiener->get_all_messages(temp);
-//        sleep(1);
-//        i++;
+    Configuration::codeCycle status = Configuration::STARTING;
+
+    while(1){
+
+        switch (status) {
+
+            case Configuration::STARTING:{
+                database.OpenDatabase("rpi.db");
+                esp.get_data(data);
+
+
+                status = Configuration::OPEN_WEBSOCKET;
+                break;
+            }
+            case Configuration::OPEN_WEBSOCKET:{
+
+                taskWebsocketDeamon.detach();
+                ptr_ListenerWebsocket->asyncAccpet();
+
+                status = Configuration::VALIDATION_INCOMING_MSG;
+                break;
+            }
+
+            case Configuration::VALIDATION_INCOMING_MSG:{
+                listiener->check_all_pointers();
+                vector<string> temp;
+                listiener->get_all_messages(temp);
+
+                if(!temp.empty())
+                {
+                    cout << "STATUS: " << status << endl;
+                }
+
+
+//                status = (Configuration::codeCycle)(status + 1);
+                break;
+            }
+
+
+            case Configuration::OPEN_DATABASE:
+                break;
+            case Configuration::SENDING_TO_ESP:
+                break;
+        }
+
+
+
 
     }
+
 
     return 0;
 }

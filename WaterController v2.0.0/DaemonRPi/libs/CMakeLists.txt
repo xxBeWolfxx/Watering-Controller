@@ -3,5 +3,5 @@ add_library(
         src/Database.cpp
         src/Database.h
         src/WebsocketService.cpp
-        src/WebsocketService.h src/Configuration.cpp src/Configuration.h)
+        src/WebsocketService.h src/Configuration.cpp src/Configuration.h src/Record.cpp src/Record.h)
 target_include_directories(libs PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")

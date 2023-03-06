@@ -15,7 +15,6 @@ struct settings{
     unsigned short port;
 };
 
-
 class Configuration {
 
 private:
@@ -27,6 +26,15 @@ public:
     settings config;
     Configuration(string filename);
     ~Configuration();
+
+    enum codeCycle{
+        STARTING,
+        OPEN_DATABASE,
+        OPEN_WEBSOCKET,
+        VALIDATION_INCOMING_MSG,
+        SENDING_TO_ESP
+    };
+
 
     void ReadSetting();
 };

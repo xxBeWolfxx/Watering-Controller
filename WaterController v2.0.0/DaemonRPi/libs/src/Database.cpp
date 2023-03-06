@@ -39,15 +39,6 @@ Database::Database() {
 
 }
 
-int Database::callback(void *NotUsed, int argc, char **argv, char **azColName) {
-    Flower temp;
-    temp.name = std::string(argv[0]);
-    temp.coordinate = std::string(argv[1]);
-    sscanf(argv[2], "%d", &temp.timestamp);
-//    vData.push_back(temp);
-    return 0;
-
-}
 
 uint8_t Database::OpenDatabase(std::string database) {
     uint8_t rc = 0;
@@ -91,16 +82,16 @@ uint8_t Database::InsertData(std::string *table, std::string *columns, std::stri
 
 }
 
-uint8_t Database::Select_all_data(std::string tableName, std::vector<std::string> &data) {
-    std::string *record = new std::string();
-    *record = "SELECT * from " + tableName;
-
-    this->SelectData(record, data);
-
-
-    delete record;
-
-}
+//uint8_t Database::Select_all_data(std::string tableName, std::vector<std::string> &data) {
+//    std::string *record = new std::string();
+//    *record = "SELECT * from " + tableName;
+//
+//    this->SelectData(record, data);
+//
+//
+//    delete record;
+//
+//}
 
 
 
