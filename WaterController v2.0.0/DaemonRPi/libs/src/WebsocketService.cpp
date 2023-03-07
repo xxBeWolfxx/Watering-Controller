@@ -7,6 +7,8 @@
 
 
 WebsocketService::WebsocketService(tcp::socket&& socket) : ws(std::move(socket)) {
+
+
     this->state = true;
     this->new_message_appeared = false;
 }
@@ -99,6 +101,10 @@ void WebsocketService::sy_write(std::string msg) {
 
 }
 
+void WebsocketService::assignClientIP(std::string ip) {
+    this->clientIPaddress = ip;
+}
+
 
 ListenerWebsocket::ListenerWebsocket(net::io_context &ioc, std::string ipAddress, unsigned short port) :
         ioc(ioc), acceptor(ioc, {net::ip::make_address(ipAddress), port}){
@@ -107,8 +113,10 @@ ListenerWebsocket::ListenerWebsocket(net::io_context &ioc, std::string ipAddress
 
 void ListenerWebsocket::asyncAccpet() {
     acceptor.async_accept(ioc, [self{shared_from_this()}](boost::system::error_code ec, tcp::socket socket){
+        std::string ipAddress = socket.remote_endpoint().address().to_string();
         auto ptr = std::make_shared<WebsocketService>(std::move(socket));
         self->ptrVector.push_back(ptr);
+        ptr->assignClientIP(ipAddress);
         ptr->process();
         self->asyncAccpet();
 

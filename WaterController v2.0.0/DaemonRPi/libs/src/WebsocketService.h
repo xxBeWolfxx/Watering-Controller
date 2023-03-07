@@ -28,6 +28,7 @@ private:
 
     bool state;
     std::string content;
+    std::string clientIPaddress;
 
 
 public:
@@ -37,9 +38,10 @@ public:
     bool new_message_appeared;
 
 
-    WebsocketService(tcp::socket&& socket);
+    explicit WebsocketService(tcp::socket&& socket);
     ~WebsocketService();
 
+    void assignClientIP(std::string ip);
     void setState(bool status);
     bool getState();
     std::string getContent();

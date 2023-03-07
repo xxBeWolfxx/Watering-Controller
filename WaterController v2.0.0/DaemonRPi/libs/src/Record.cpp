@@ -17,28 +17,43 @@ Record::Record(Database *database, uint16_t id) {
 
 
 ESP_unit::ESP_unit(Database *database, uint16_t id) : Record(database, id) {
-
+    this->timestampOfLastMessage = std::time(0);
 }
 
-uint8_t ESP_unit::get_data(vector<string> &data) {
+uint8_t ESP_unit::get_record(vector<string> &data) {
     string *comand = new string;
     *comand = "SELECT * FROM ESP WHERE id=" + to_string(this->ID);
     this->database->SelectData(comand, data);
-
-
-
-
     delete comand;
 
     if(data.empty()){
         return 0;
     }
 
+
     return 1;
 
 }
 
-uint8_t ESP_unit::put_data(vector<string> &data) {
+uint8_t ESP_unit::put_record() {
+    string *values = new string;
+    string *columns = new string;
+    string *table = new string;
+
+    *values = to_string(this->ID) + "," + to_string(this->timestampOfLastMessage);
+    *columns = "ID, timestamp_last_msg";
+    *table = "ESP";
+
+
+    database->InsertData(table, columns, values);
+
+    delete values;
+    delete columns;
+    delete table;
+
+}
+
+void ESP_unit::assign_values(string data) {
 
 
 }

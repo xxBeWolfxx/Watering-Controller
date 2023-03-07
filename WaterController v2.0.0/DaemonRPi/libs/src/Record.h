@@ -6,6 +6,7 @@
 #define DAEMONRPI_RECORD_H
 
 #include <cstdint>
+#include <ctime>
 #include <vector>
 #include "Database.h"
 
@@ -19,8 +20,9 @@ protected:
 public:
     Record(Database *database, uint16_t id);
 
-    virtual uint8_t get_data(vector<string> &data) = 0;
-    virtual uint8_t put_data(vector<string> &data) = 0;
+    virtual uint8_t get_record(vector<string> &data) = 0;
+    virtual uint8_t put_record() = 0;
+    virtual void assign_values(string data) = 0;
     uint16_t get_id();
 
 
@@ -30,10 +32,13 @@ public:
 class ESP_unit : public Record{
 
 public:
+    time_t timestampOfLastMessage;
+
     ESP_unit(Database *database, uint16_t id);
 
-    uint8_t get_data(vector<string> &data) override;
-    uint8_t put_data(vector<string> &data) override;
+    uint8_t get_record(vector<string> &data) override;
+    uint8_t put_record() override;
+    void assign_values(string data) override;
 };
 
 

@@ -48,7 +48,7 @@ int main() {
 
             case Configuration::STARTING:{
                 database.OpenDatabase("rpi.db");
-                esp.get_data(data);
+                esp.get_record(data);
 
 
                 status = Configuration::OPEN_WEBSOCKET;
