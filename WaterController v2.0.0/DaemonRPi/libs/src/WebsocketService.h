@@ -13,6 +13,7 @@
 #include <thread>
 #include <vector>
 
+
 namespace beast = boost::beast;         // from <boost/beast.hpp>
 namespace http = beast::http;           // from <boost/beast/http.hpp>
 namespace websocket = beast::websocket; // from <boost/beast/websocket.hpp>
@@ -62,7 +63,10 @@ class ListenerWebsocket : public std::enable_shared_from_this<ListenerWebsocket>
 
 public:
     std::vector<std::shared_ptr<WebsocketService>> ptrVector;
+
+
     ListenerWebsocket(net::io_context& ioc, std::string ipAddress, unsigned short int port);
+
     void asyncAccpet();
 
     void check_all_pointers();

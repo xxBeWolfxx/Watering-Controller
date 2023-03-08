@@ -14,8 +14,7 @@ BOOST_AUTO_TEST_SUITE(DATABASE);
 BOOST_AUTO_TEST_CASE(stringCheck){
 
 
-    Flower x1 = {};
-    x1.timestamp = 1;
+
 
     uint16_t count = Database::countWords("DD XX", ' ');
 

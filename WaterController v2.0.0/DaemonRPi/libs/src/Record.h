@@ -9,6 +9,7 @@
 #include <ctime>
 #include <vector>
 #include "Database.h"
+#include "WebsocketService.h"
 
 using namespace std;
 
@@ -30,6 +31,9 @@ public:
 };
 
 class ESP_unit : public Record{
+private:
+    WebsocketService *esp_websocket;
+
 
 public:
     time_t timestampOfLastMessage;
@@ -39,6 +43,10 @@ public:
     uint8_t get_record(vector<string> &data) override;
     uint8_t put_record() override;
     void assign_values(string data) override;
+
+    void assign_websocket(WebsocketService *ptr);
+
+    static uint8_t check_it_is_exist(vector<ESP_unit> esp_modules, shared_ptr<WebsocketService> &ptr);
 };
 
 
