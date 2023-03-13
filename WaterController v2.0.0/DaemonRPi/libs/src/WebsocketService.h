@@ -55,26 +55,6 @@ public:
 
 };
 
-class ListenerWebsocket : public std::enable_shared_from_this<ListenerWebsocket>{
-    net::io_context &ioc;
-    tcp::acceptor acceptor;
-
-
-
-public:
-    std::vector<std::shared_ptr<WebsocketService>> ptrVector;
-
-
-    ListenerWebsocket(net::io_context& ioc, std::string ipAddress, unsigned short int port);
-
-    void asyncAccpet();
-
-    void check_all_pointers();
-    void get_all_messages(std::vector<std::string> &payload);
-
-
-
-};
 
 
 

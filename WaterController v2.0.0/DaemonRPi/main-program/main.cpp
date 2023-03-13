@@ -9,6 +9,7 @@
 #include "WebsocketService.h"
 #include "Record.h"
 #include "Configuration.h"
+#include "ListenerWebsocket.h"
 
 using namespace std;
 
@@ -25,8 +26,11 @@ int main() {
     net::io_context ioc{};
     std::thread taskWebsocketDeamon(websocketTask, &ioc);
 
+
+
     shared_ptr<ListenerWebsocket> ptr_ListenerWebsocket = std::make_shared<ListenerWebsocket>(ioc, "127.0.0.1",config.config.port);
     ListenerWebsocket *listiener = ptr_ListenerWebsocket.get();
+
 
 
 
@@ -37,7 +41,7 @@ int main() {
 //    database.Select_all_data("PLANT", data);
 
     ESP_unit esp = ESP_unit(&database, 101);
-
+    listiener->assignVectorWebsocket(&esp.vecWebsocketESP);
 
 
     Configuration::codeCycle status = Configuration::STARTING;

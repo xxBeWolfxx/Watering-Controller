@@ -9,6 +9,16 @@
 #include <sqlite3.h>
 #include "Database.h"
 
+struct testStr{
+    uint32_t val1;
+}testStr;
+
+class cl{
+public:
+    cl(){};
+    struct testStr clTest;
+};
+
 BOOST_AUTO_TEST_SUITE(DATABASE);
 
 BOOST_AUTO_TEST_CASE(stringCheck){
@@ -23,7 +33,18 @@ BOOST_AUTO_TEST_CASE(stringCheck){
 }
 
 BOOST_AUTO_TEST_CASE(nextTest){
-    BOOST_CHECK(1 == 1);
+
+    struct testStr *ptr;
+    std::shared_ptr<cl> vv = std::make_shared<cl>();
+
+    ptr = &(vv->clTest);
+
+
+    BOOST_CHECK(ptr->val1 == vv->clTest.val1);
+
+    vv.reset();
+
+    BOOST_CHECK(ptr->val1 == NULL);
 }
 
 BOOST_AUTO_TEST_SUITE_END();

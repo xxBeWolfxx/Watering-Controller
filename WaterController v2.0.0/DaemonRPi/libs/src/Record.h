@@ -10,6 +10,8 @@
 #include <vector>
 #include "Database.h"
 #include "WebsocketService.h"
+#include "ListenerWebsocket.h"
+
 
 using namespace std;
 
@@ -37,6 +39,8 @@ private:
 
 public:
     time_t timestampOfLastMessage;
+
+    std::shared_ptr<WebsocketService> WebsocketESP;
 
     ESP_unit(Database *database, uint16_t id);
 

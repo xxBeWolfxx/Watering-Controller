@@ -61,7 +61,6 @@ void ESP_unit::assign_values(string data) {
 void ESP_unit::assign_websocket(WebsocketService *ptr) {
     this->esp_websocket = ptr;
 
-
 }
 
 std::uint8_t ESP_unit::check_it_is_exist(vector<ESP_unit> esp_modules, shared_ptr<WebsocketService> &ptr) {
