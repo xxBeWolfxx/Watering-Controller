@@ -10,7 +10,7 @@
 #include <vector>
 #include "Database.h"
 #include "WebsocketService.h"
-#include "ListenerWebsocket.h"
+
 
 
 using namespace std;
@@ -21,7 +21,7 @@ protected:
     Database *database;
 
 public:
-    Record(Database *database, uint16_t id);
+    Record();
 
     virtual uint8_t get_record(vector<string> &data) = 0;
     virtual uint8_t put_record() = 0;
@@ -34,21 +34,22 @@ public:
 
 class ESP_unit : public Record{
 private:
-    WebsocketService *esp_websocket;
+
 
 
 public:
     time_t timestampOfLastMessage;
 
-    std::shared_ptr<WebsocketService> WebsocketESP;
+    std::shared_ptr<WebsocketService> websocketESP;
 
-    ESP_unit(Database *database, uint16_t id);
+    ESP_unit();
+    ~ESP_unit();
 
     uint8_t get_record(vector<string> &data) override;
     uint8_t put_record() override;
     void assign_values(string data) override;
 
-    void assign_websocket(WebsocketService *ptr);
+    void assign_pointer_websocket(std::shared_ptr<WebsocketService> ptr);
 
     static uint8_t check_it_is_exist(vector<ESP_unit> esp_modules, shared_ptr<WebsocketService> &ptr);
 };

@@ -40,8 +40,10 @@ int main() {
 
 //    database.Select_all_data("PLANT", data);
 
-    ESP_unit esp = ESP_unit(&database, 101);
-    listiener->assignVectorWebsocket(&esp.vecWebsocketESP);
+//    ESP_unit esp = ESP_unit(&database, 101);
+    ESP_unit esp = ESP_unit();
+    vector<shared_ptr<ESP_unit>> vecESP;
+    listiener->assignVectorWebsocket(vecESP);
 
 
     Configuration::codeCycle status = Configuration::STARTING;

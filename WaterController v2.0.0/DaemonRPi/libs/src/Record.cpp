@@ -4,21 +4,29 @@
 
 #include "Record.h"
 
+#include <utility>
+
 
 uint16_t Record::get_id() {
     return this->ID;
 }
 
-Record::Record(Database *database, uint16_t id) {
-    this->database = database;
-    this->ID = id;
+Record::Record() {
+//    this->database = database;
+//    this->ID = id;
 
 }
 
 
-ESP_unit::ESP_unit(Database *database, uint16_t id) : Record(database, id) {
+ESP_unit::ESP_unit() : Record() {
     this->timestampOfLastMessage = std::time(0);
 }
+
+ESP_unit::~ESP_unit() {
+//    this->websocketESP.reset();
+//    std::cout << "TEST" << std::endl;
+}
+
 
 uint8_t ESP_unit::get_record(vector<string> &data) {
     string *comand = new string;
@@ -58,8 +66,8 @@ void ESP_unit::assign_values(string data) {
 
 }
 
-void ESP_unit::assign_websocket(WebsocketService *ptr) {
-    this->esp_websocket = ptr;
+void ESP_unit::assign_pointer_websocket(std::shared_ptr<WebsocketService> ptr){
+    this->websocketESP = std::move(ptr);
 
 }
 
@@ -68,4 +76,5 @@ std::uint8_t ESP_unit::check_it_is_exist(vector<ESP_unit> esp_modules, shared_pt
 
     return 0;
 }
+
 

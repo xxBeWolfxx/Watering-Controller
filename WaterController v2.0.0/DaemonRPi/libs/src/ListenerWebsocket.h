@@ -25,12 +25,12 @@ class ListenerWebsocket : public std::enable_shared_from_this<ListenerWebsocket>
 
 
 public:
-    std::vector<ESP_unit> *ptrVector;
+    std::vector<std::shared_ptr<ESP_unit>> ptrVector;
 
 
     ListenerWebsocket(net::io_context& ioc, std::string ipAddress, unsigned short int port);
 
-    void assignVectorWebsocket(std::vector<std::shared_ptr<WebsocketService>> *ptr);
+    void assignVectorWebsocket(std::vector<std::shared_ptr<ESP_unit>> &ptr);
     void asyncAccpet();
 
     void check_all_pointers();
