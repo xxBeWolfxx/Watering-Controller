@@ -10,10 +10,22 @@
 #include <vector>
 #include "Database.h"
 #include "WebsocketService.h"
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 
 
 using namespace std;
+
+enum ESP_STATUS{
+    INIT = 0,
+    CHECKING_DATABASE,
+    IN_DATABASE,
+    NEW_ELEMENT,
+    WORKING
+};
+
+
 
 class Record {
 protected:
@@ -34,8 +46,7 @@ public:
 
 class ESP_unit : public Record{
 private:
-
-
+    ESP_STATUS status;
 
 public:
     time_t timestampOfLastMessage;
@@ -50,8 +61,9 @@ public:
     void assign_values(string data) override;
 
     void assign_pointer_websocket(std::shared_ptr<WebsocketService> ptr);
+    bool check_message_status();
+    void message_validation();
 
-    static uint8_t check_it_is_exist(vector<ESP_unit> esp_modules, shared_ptr<WebsocketService> &ptr);
 };
 
 

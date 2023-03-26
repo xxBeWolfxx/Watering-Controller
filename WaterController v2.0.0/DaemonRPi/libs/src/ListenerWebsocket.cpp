@@ -19,7 +19,7 @@ void ListenerWebsocket::asyncAccpet() {
         newUnit->assign_pointer_websocket(std::move(ptr));
 
 
-        self->ptrVector.push_back(std::move(newUnit));
+        self->ptrVector->push_back(std::move(newUnit));
 
 
         self->asyncAccpet();
@@ -29,18 +29,17 @@ void ListenerWebsocket::asyncAccpet() {
 
 }
 
-void ListenerWebsocket::check_all_pointers() {
+void ListenerWebsocket::delete_all_not_working_ESP() {
     std::vector<uint8_t> positionOfItem;
     bool itemFound = false;
     uint8_t iterator = 0;
-    for ( auto ptr : this->ptrVector){
+    for ( auto &ptr : *this->ptrVector){
         ESP_unit *esp = ptr.get();
         WebsocketService *item = esp->websocketESP.get();
 
         if(!item->getState()){
             esp->websocketESP.reset();
             ptr.reset();
-            ptr = nullptr;
             itemFound = true;
             positionOfItem.push_back(iterator);
         }
@@ -50,14 +49,14 @@ void ListenerWebsocket::check_all_pointers() {
     if (itemFound){
         std::reverse(positionOfItem.begin(), positionOfItem.end());
         for (uint8_t item : positionOfItem){
-            this->ptrVector.erase(ptrVector.begin() + item);
+            this->ptrVector->erase(ptrVector->begin() + item);
         }
     }
 
 }
 
 void ListenerWebsocket::get_all_messages(std::vector<std::string> &payload) {
-    for(std::shared_ptr<ESP_unit> ptr : this->ptrVector){
+    for(std::shared_ptr<ESP_unit> &ptr : *this->ptrVector){
         ESP_unit *esp = ptr.get();
         WebsocketService *item = esp->websocketESP.get();
 
@@ -69,5 +68,5 @@ void ListenerWebsocket::get_all_messages(std::vector<std::string> &payload) {
 }
 
 void ListenerWebsocket::assignVectorWebsocket(std::vector<std::shared_ptr<ESP_unit>> &ptr) {
-    this->ptrVector = ptr;
+    this->ptrVector = &ptr;
 }

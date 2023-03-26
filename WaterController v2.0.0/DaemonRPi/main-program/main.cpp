@@ -41,7 +41,7 @@ int main() {
 //    database.Select_all_data("PLANT", data);
 
 //    ESP_unit esp = ESP_unit(&database, 101);
-    ESP_unit esp = ESP_unit();
+//    ESP_unit esp = ESP_unit();
     vector<shared_ptr<ESP_unit>> vecESP;
     listiener->assignVectorWebsocket(vecESP);
 
@@ -54,7 +54,7 @@ int main() {
 
             case Configuration::STARTING:{
                 database.OpenDatabase("rpi.db");
-                esp.get_record(data);
+//                esp.get_record(data);
 
 
                 status = Configuration::OPEN_WEBSOCKET;
@@ -70,9 +70,15 @@ int main() {
             }
 
             case Configuration::VALIDATION_INCOMING_MSG:{
-                listiener->check_all_pointers();
+                listiener->delete_all_not_working_ESP();
                 vector<string> temp;
-                listiener->get_all_messages(temp);
+//                listiener->get_all_messages(temp);
+
+                for(auto &item : vecESP){
+                    if (item->check_message_status()){
+                        item->message_validation();
+                    }
+                }
 
                 if(!temp.empty())
                 {

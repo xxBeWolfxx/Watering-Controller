@@ -19,6 +19,7 @@ Record::Record() {
 
 
 ESP_unit::ESP_unit() : Record() {
+    this->status = ESP_STATUS::INIT;
     this->timestampOfLastMessage = std::time(0);
 }
 
@@ -71,10 +72,42 @@ void ESP_unit::assign_pointer_websocket(std::shared_ptr<WebsocketService> ptr){
 
 }
 
-std::uint8_t ESP_unit::check_it_is_exist(vector<ESP_unit> esp_modules, shared_ptr<WebsocketService> &ptr) {
-
-
-    return 0;
+bool ESP_unit::check_message_status() {
+    return this->websocketESP->new_message_appeared;
 }
+
+void ESP_unit::message_validation() {
+
+    switch(this->status){
+
+        case INIT: {
+            std::string message = this->websocketESP->getContent();
+            boost::property_tree::ptree pt;
+            boost::property_tree::read_json(message, pt);
+            this->ID = pt.get<std::uint16_t>("ID");
+
+            this->status = ESP_STATUS::CHECKING_DATABASE;
+            break;
+        }
+        case CHECKING_DATABASE: {
+            std::cout << "NEW ELEMENT " << this->ID << std::endl;
+
+            this->websocketESP->new_message_appeared = false;
+            this->status = ESP_STATUS::WORKING;
+            break;
+        }
+
+//        case IN_DATABASE:
+//            break;
+//        case NEW_ELEMENT:
+//            break;
+        case WORKING: {
+            std::uint8_t x = 10;
+            break;
+        }
+    }
+
+}
+
 
 
