@@ -25,7 +25,7 @@ ESP_unit::ESP_unit() : Record() {
 
 ESP_unit::~ESP_unit() {
 //    this->websocketESP.reset();
-//    std::cout << "TEST" << std::endl;
+   std::cout << "ESP DEL" << std::endl;
 }
 
 
