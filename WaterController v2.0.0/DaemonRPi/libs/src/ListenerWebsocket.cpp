@@ -11,13 +11,11 @@ ListenerWebsocket::ListenerWebsocket(net::io_context &ioc, std::string ipAddress
 void ListenerWebsocket::asyncAccpet() {
     acceptor.async_accept(ioc, [self{shared_from_this()}](boost::system::error_code ec, tcp::socket socket){
         std::string ipAddress = socket.remote_endpoint().address().to_string();
-        auto ptr = std::make_shared<WebsocketService>(std::move(socket));
-
-        ptr->assignClientIP(ipAddress);
-        ptr->process();
         std::shared_ptr<ESP_unit> newUnit = std::make_shared<ESP_unit>();
-        newUnit->assign_pointer_websocket(std::move(ptr));
 
+        newUnit->websocketESP = std::make_shared<WebsocketService>(std::move(socket));
+        newUnit->websocketESP->assignClientIP(ipAddress);
+        newUnit->websocketESP->process();
 
         self->ptrVector->push_back(std::move(newUnit));
 
