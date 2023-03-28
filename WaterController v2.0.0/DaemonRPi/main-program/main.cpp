@@ -32,8 +32,6 @@ int main() {
     ListenerWebsocket *listiener = ptr_ListenerWebsocket.get();
 
 
-
-
     vector<string> data;
 
     Database database = Database();

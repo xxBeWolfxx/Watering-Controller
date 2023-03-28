@@ -81,7 +81,8 @@ void ESP_unit::message_validation() {
     switch(this->status){
 
         case INIT: {
-            std::string message = this->websocketESP->getContent();
+            std::stringstream message;
+            message.str(this->websocketESP->getContent());
             boost::property_tree::ptree pt;
             boost::property_tree::read_json(message, pt);
             this->ID = pt.get<std::uint16_t>("ID");
@@ -90,8 +91,6 @@ void ESP_unit::message_validation() {
             break;
         }
         case CHECKING_DATABASE: {
-            std::cout << "NEW ELEMENT " << this->ID << std::endl;
-
             this->websocketESP->new_message_appeared = false;
             this->status = ESP_STATUS::WORKING;
             break;
@@ -103,6 +102,9 @@ void ESP_unit::message_validation() {
 //            break;
         case WORKING: {
             std::uint8_t x = 10;
+            this->websocketESP->new_message_appeared = false;
+            this->websocketESP->sy_write("CHECKING");
+            sleep(2);
             break;
         }
     }

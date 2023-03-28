@@ -29,7 +29,7 @@ void ListenerWebsocket::asyncAccpet() {
 
 }
 
-void ListenerWebsocket::delete_all_not_working_ESP() {
+void ListenerWebsocket::delete_all_not_working_ESP() const {
     std::vector<uint8_t> positionOfItem;
     bool itemFound = false;
     uint8_t iterator = 0;

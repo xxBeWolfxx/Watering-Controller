@@ -33,7 +33,7 @@ public:
     void assignVectorWebsocket(std::vector<std::shared_ptr<ESP_unit>> &ptr);
     void asyncAccpet();
 
-    void delete_all_not_working_ESP();
+    void delete_all_not_working_ESP() const;
     void get_all_messages(std::vector<std::string> &payload);
 
 

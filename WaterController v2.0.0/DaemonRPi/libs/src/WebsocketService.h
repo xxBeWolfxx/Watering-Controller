@@ -44,7 +44,7 @@ public:
 
     void assignClientIP(std::string ip);
     void setState(bool status);
-    bool getState();
+    bool getState() const;
     std::string getContent();
 
     void process();

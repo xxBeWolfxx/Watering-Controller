@@ -32,7 +32,7 @@ void WebsocketService::setState(bool status) {
     this->state = status;
 }
 
-bool WebsocketService::getState() {
+bool WebsocketService::getState() const {
     return this->state;
 }
 
@@ -57,13 +57,11 @@ void WebsocketService::echo() {
                         std::cout << ec.message() << "\n"; return;
                     }
 
-                    std::string out = beast::buffers_to_string(self->buffer.cdata());
-                    std::cout<<out<<" "<<std::flush;
+                    self->content = beast::buffers_to_string(self->buffer.cdata());
                     self->buffer.consume(self->buffer.size());
-
                     self->new_message_appeared = true;
 
-                    self->asy_write("{\"Status\":\"OK\"}");
+                    self->asy_write(R"({"Status":"OK"})");
 
                     self->echo();
 
