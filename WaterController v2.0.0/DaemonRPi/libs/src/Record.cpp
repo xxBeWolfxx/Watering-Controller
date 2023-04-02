@@ -25,7 +25,7 @@ ESP_unit::ESP_unit() : Record() {
 
 ESP_unit::~ESP_unit() {
 //    this->websocketESP.reset();
-   std::cout << "ESP DEL" << std::endl;
+//   std::cout << "ESP DEL" << std::endl;
 }
 
 
@@ -76,7 +76,7 @@ bool ESP_unit::check_message_status() {
     return this->websocketESP->new_message_appeared;
 }
 
-void ESP_unit::message_validation() {
+void ESP_unit::validate_incoming_messages() {
 
     switch(this->status){
 
@@ -91,15 +91,29 @@ void ESP_unit::message_validation() {
             break;
         }
         case CHECKING_DATABASE: {
+            std::vector<std::string> data;
+            this->get_record(data);
+
+            if(data.empty()){
+                this->status = ESP_STATUS::NEW_ELEMENT;
+            }
+            else{
+                this->status = ESP_STATUS::IN_DATABASE;
+            }
+
             this->websocketESP->new_message_appeared = false;
-            this->status = ESP_STATUS::WORKING;
+
             break;
         }
 
-//        case IN_DATABASE:
-//            break;
-//        case NEW_ELEMENT:
-//            break;
+        case IN_DATABASE: {
+            this->status = ESP_STATUS::WORKING;
+            break;
+        }
+        case NEW_ELEMENT: {
+            this->status = ESP_STATUS::WORKING;
+            break;
+        }
         case WORKING: {
             std::uint8_t x = 10;
             this->websocketESP->new_message_appeared = false;

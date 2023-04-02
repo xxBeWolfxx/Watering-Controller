@@ -30,7 +30,7 @@ enum ESP_STATUS{
 class Record {
 protected:
     uint16_t ID;
-    Database *database;
+
 
 public:
     Record();
@@ -40,6 +40,7 @@ public:
     virtual void assign_values(string data) = 0;
     uint16_t get_id();
 
+    static Database *database;
 
 
 };
@@ -62,7 +63,7 @@ public:
 
     void assign_pointer_websocket(std::shared_ptr<WebsocketService> ptr);
     bool check_message_status();
-    void message_validation();
+    void validate_incoming_messages();
 
 };
 

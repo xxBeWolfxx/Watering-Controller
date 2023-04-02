@@ -18,6 +18,7 @@ void websocketTask(net::io_context *ioc) {
     ioc->run();
 }
 
+Database *Record::database;
 
 int main() {
     Configuration config = Configuration("config.txt");
@@ -33,13 +34,13 @@ int main() {
 
 
     vector<string> data;
-
     Database database = Database();
 
 //    database.Select_all_data("PLANT", data);
 
     vector<shared_ptr<ESP_unit>> vecESP;
     listiener->assignVectorWebsocket(vecESP);
+    Record::database = &database;
 
 
     Configuration::codeCycle status = Configuration::STARTING;
@@ -71,7 +72,7 @@ int main() {
 
                 for(auto &item : vecESP){
                     if (item->check_message_status()){
-                        item->message_validation();
+                        item->validate_incoming_messages();
                     }
                 }
 
