@@ -64,6 +64,7 @@ public:
     void assign_pointer_websocket(std::shared_ptr<WebsocketService> ptr);
     bool check_message_status();
     void validate_incoming_messages();
+    void get_values_from_json(std::vector<std::string> parameters, std::vector<std::string> *containerForValues);
 
 };
 

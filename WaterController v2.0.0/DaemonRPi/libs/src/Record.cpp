@@ -81,11 +81,14 @@ void ESP_unit::validate_incoming_messages() {
     switch(this->status){
 
         case INIT: {
-            std::stringstream message;
-            message.str(this->websocketESP->getContent());
-            boost::property_tree::ptree pt;
-            boost::property_tree::read_json(message, pt);
-            this->ID = pt.get<std::uint16_t>("ID");
+
+            std::vector<std::string> parameters = { "ID" };
+            std::vector<std::string> values;
+            this->get_values_from_json(parameters, &values);
+
+            if(!values.empty()){
+                this->ID = (uint16_t) std::stoi(values[0]);
+            }
 
             this->status = ESP_STATUS::CHECKING_DATABASE;
             break;
@@ -122,6 +125,20 @@ void ESP_unit::validate_incoming_messages() {
             break;
         }
     }
+
+}
+
+void ESP_unit::get_values_from_json(std::vector<std::string> parameters, std::vector<std::string> *containerForValues) {
+    std::stringstream message;
+    message.str(this->websocketESP->getContent());
+    boost::property_tree::ptree pt;
+    boost::property_tree::read_json(message, pt);
+
+    for (std::string param : parameters){
+        containerForValues->push_back(pt.get<string>(param));
+    }
+
+
 
 }
 
