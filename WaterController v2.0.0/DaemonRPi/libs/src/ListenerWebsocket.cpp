@@ -53,18 +53,6 @@ void ListenerWebsocket::delete_all_not_working_ESP() const {
 
 }
 
-void ListenerWebsocket::get_all_messages(std::vector<std::string> &payload) {
-    for(std::shared_ptr<ESP_unit> &ptr : *this->ptrVector){
-        ESP_unit *esp = ptr.get();
-        WebsocketService *item = esp->websocketESP.get();
-
-        if(item->new_message_appeared){
-            payload.push_back(item->getContent());
-            item->new_message_appeared = false;
-        }
-    }
-}
-
 void ListenerWebsocket::assignVectorWebsocket(std::vector<std::shared_ptr<ESP_unit>> &ptr) {
     this->ptrVector = &ptr;
 }

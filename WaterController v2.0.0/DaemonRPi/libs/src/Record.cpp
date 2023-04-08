@@ -21,6 +21,7 @@ Record::Record() {
 ESP_unit::ESP_unit() : Record() {
     this->status = ESP_STATUS::INIT;
     this->timestampOfLastMessage = std::time(0);
+    this->vectorOfFlowers = std::vector<Flower>(2);
 }
 
 ESP_unit::~ESP_unit() {
@@ -64,11 +65,6 @@ uint8_t ESP_unit::put_record() {
 
 void ESP_unit::assign_values(string data) {
 
-
-}
-
-void ESP_unit::assign_pointer_websocket(std::shared_ptr<WebsocketService> ptr){
-    this->websocketESP = std::move(ptr);
 
 }
 
@@ -120,7 +116,6 @@ void ESP_unit::validate_incoming_messages() {
         case WORKING: {
             std::uint8_t x = 10;
             this->websocketESP->new_message_appeared = false;
-            this->websocketESP->sy_write("CHECKING");
             sleep(2);
             break;
         }
@@ -143,4 +138,6 @@ void ESP_unit::get_values_from_json(std::vector<std::string> parameters, std::ve
 }
 
 
+Flower::Flower()  {
 
+}

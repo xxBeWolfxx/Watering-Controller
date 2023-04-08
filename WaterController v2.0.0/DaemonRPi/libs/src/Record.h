@@ -45,6 +45,40 @@ public:
 
 };
 
+struct Measurement{
+    uint8_t humidity, insolation;
+    float temperature;
+
+    std::vector<uint8_t> listOfHumidity;
+    std::vector<uint8_t> listOfTemperature;
+    std::vector<uint8_t> listOfInsolation;
+
+    Measurement(){
+        listOfHumidity = std::vector<uint8_t>(10);
+        listOfInsolation = std::vector<uint8_t>(10);
+        listOfTemperature = std::vector<uint8_t>(10);
+    };
+
+};
+
+
+class Flower : public Record{
+private:
+    uint16_t espID;
+    std::string namePlant;
+
+    Measurement measurementOfFlower;
+
+public:
+    Flower();
+    ~Flower();
+
+    uint8_t get_record(vector<string> &data) override {};
+    uint8_t put_record() override {};
+    void assign_values(string data) override {};
+
+};
+
 class ESP_unit : public Record{
 private:
     ESP_STATUS status;
@@ -53,6 +87,7 @@ public:
     time_t timestampOfLastMessage;
 
     std::shared_ptr<WebsocketService> websocketESP;
+    std::vector<Flower> vectorOfFlowers;
 
     ESP_unit();
     ~ESP_unit();
@@ -61,7 +96,6 @@ public:
     uint8_t put_record() override;
     void assign_values(string data) override;
 
-    void assign_pointer_websocket(std::shared_ptr<WebsocketService> ptr);
     bool check_message_status();
     void validate_incoming_messages();
     void get_values_from_json(std::vector<std::string> parameters, std::vector<std::string> *containerForValues);
@@ -69,11 +103,6 @@ public:
 };
 
 
-//class Flower : public Record{
-//
-//
-//
-//};
 
 
 #endif //DAEMONRPI_RECORD_H
