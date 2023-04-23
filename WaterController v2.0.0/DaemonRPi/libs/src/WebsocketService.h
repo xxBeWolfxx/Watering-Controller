@@ -46,6 +46,7 @@ public:
     void setState(bool status);
     bool getState() const;
     std::string getContent();
+    std::string getIPaddress();
 
     void process();
     void echo();

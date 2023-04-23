@@ -114,7 +114,7 @@ uint8_t Database::SelectData(std::string *command, std::vector<std::string> &dat
 
 
         for (uint8_t i = 0; i < columnNumber; i++){
-            temp = temp + "{" + std::string((char *) sqlite3_column_text(stmt, i)) + "}";
+            temp = temp + std::string((char *) sqlite3_column_text(stmt, i)) + "/";
         }
         data.push_back(temp);
         temp = "";
@@ -126,10 +126,5 @@ uint8_t Database::SelectData(std::string *command, std::vector<std::string> &dat
     return 0;
 }
 
-/*
- * ID esp32 {
- *
- *
- */
 
 

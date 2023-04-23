@@ -104,5 +104,9 @@ void WebsocketService::assignClientIP(std::string ip) {
     this->clientIPaddress = ip;
 }
 
+std::string WebsocketService::getIPaddress() {
+    return this->clientIPaddress;
+}
+
 
 
