@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <ctime>
 #include <vector>
+#include <list>
 #include "Database.h"
 #include "WebsocketService.h"
 #include <boost/property_tree/ptree.hpp>
@@ -48,17 +49,19 @@ public:
 };
 
 struct Measurement{
-    uint8_t humidity, insolation;
-    float temperature;
+    uint8_t rescipeHumidity, rescipeInsolation, avgHumidity, avgInsolation;
+    float rescipeTemperature, avgTemperature;
 
-    std::vector<uint8_t> listOfHumidity;
-    std::vector<uint8_t> listOfTemperature;
-    std::vector<uint8_t> listOfInsolation;
+    std::vector<uint8_t> vecOfHumidity;
+    std::vector<float> vecOfTemperature;
+    std::vector<uint8_t> vecOfInsolation;
 
     Measurement(){
-        listOfHumidity = std::vector<uint8_t>(10);
-        listOfInsolation = std::vector<uint8_t>(10);
-        listOfTemperature = std::vector<uint8_t>(10);
+        rescipeHumidity = rescipeInsolation = avgHumidity = avgInsolation = 0;
+        rescipeTemperature = avgTemperature = 0.0;
+        vecOfHumidity = std::vector<uint8_t>();
+        vecOfInsolation = std::vector<uint8_t>();
+        vecOfTemperature = std::vector<uint8_t>();
     };
 
 };
@@ -80,11 +83,17 @@ public:
     ~Flower();
 
     uint8_t get_record(vector<string> &data) override;
-    uint8_t get_all_record_with_id_esp(vector<string> &data);
-    uint8_t create_record_in_database() override {};
+    uint8_t get_all_record_with_id_esp(vector<string> &data) const;
+    uint8_t create_record_in_database() override;
     void assign_values(string data) override;
 
     void get_recipe(std::string input);
+
+    void calculate_all_averages();
+
+    template<typename T>
+    static float calculate_average(const std::vector<T> &vec);
+
 
 
 };
@@ -98,7 +107,7 @@ public:
     time_t timestampOfLastMessage;
 
     std::shared_ptr<WebsocketService> websocketESP;
-    std::vector<Flower> vectorOfFlowers;
+    std::list<Flower> vectorOfFlowers;
 
     ESP_unit();
     ~ESP_unit();

@@ -208,7 +208,7 @@ uint8_t Flower::get_record(vector<string> &data) {
     return 1;
 }
 
-uint8_t Flower::get_all_record_with_id_esp(vector<string> &data) {
+uint8_t Flower::get_all_record_with_id_esp(vector<string> &data) const {
     string *comand = new string;
     *comand = "SELECT * FROM PLANT WHERE ID_ESP=" + to_string(this->espID);
     this->database->SelectData(comand, data);
@@ -230,13 +230,64 @@ void Flower::get_recipe(std::string input) {
 
     std::vector<std::string> output = this->split_record_to_seprate_values(input, ',');
 
-    this->measurementOfFlower.temperature = stoi(output[0]);
-    this->measurementOfFlower.humidity = stoi(output[1]);
-    this->measurementOfFlower.insolation = stoi(output[2]);
+    this->measurementOfFlower.rescipeTemperature = stof(output[0]);
+    this->measurementOfFlower.rescipeHumidity = stoi(output[1]);
+    this->measurementOfFlower.rescipeInsolation = stoi(output[2]);
 
 
 
 
 }
+
+uint8_t Flower::create_record_in_database() {
+    string *values = new string;
+    string *columns = new string;
+    string *table = new string;
+    string *recipe = new string;
+
+    *recipe = "[" + to_string(this->measurementOfFlower.rescipeTemperature) + ","
+              + to_string(this->measurementOfFlower.rescipeHumidity) + ","
+              + to_string(this->measurementOfFlower.rescipeInsolation) + "]";
+
+    *values = to_string(this->id) + ",'" + this->namePlant + "','" + to_string(this->espID) + "," + *recipe;
+    *columns = "ID, NAME, ID_ESP";
+    *table = "PLANT";
+
+
+    database->InsertData(table, columns, values);
+
+    delete values;
+    delete columns;
+    delete table;
+    delete recipe;
+
+
+    return 0;
+}
+
+template<typename T>
+float Flower::calculate_average(const vector<T> &vec) {
+    uint8_t size = vec.size();
+    float addition = 0;
+
+    for (auto &item : vec){
+        addition = addition + item;
+    }
+
+    if ( addition != 0 ){
+        return addition / size;
+    }
+    return 0;
+}
+
+void Flower::calculate_all_averages() {
+
+    this->measurementOfFlower.avgHumidity = (uint8_t) this->calculate_average(this->measurementOfFlower.vecOfHumidity);
+    this->measurementOfFlower.avgInsolation = (uint8_t) this->calculate_average(this->measurementOfFlower.vecOfInsolation);
+    this->measurementOfFlower.avgTemperature = this->calculate_average(this->measurementOfFlower.vecOfTemperature);
+
+}
+
+
 
 

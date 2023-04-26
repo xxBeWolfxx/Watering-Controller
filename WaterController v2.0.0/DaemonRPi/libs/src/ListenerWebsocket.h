@@ -34,7 +34,6 @@ public:
     void asyncAccpet();
 
     void delete_all_not_working_ESP() const;
-    void get_all_messages(std::vector<std::string> &payload);
 
 
 

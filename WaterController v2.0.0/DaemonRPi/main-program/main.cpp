@@ -68,7 +68,7 @@ int main() {
             case Configuration::VALIDATION_INCOMING_MSG:{
                 listiener->delete_all_not_working_ESP();
                 vector<string> temp;
-//                listiener->get_all_messages(temp);
+
 
                 for(auto &item : vecESP){
                     if (item->check_message_status()){
