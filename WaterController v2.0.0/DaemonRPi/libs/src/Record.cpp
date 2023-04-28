@@ -67,7 +67,7 @@ uint8_t ESP_unit::create_record_in_database() {
     *table = "ESP";
 
 
-    database->InsertData(table, columns, values);
+    this->database->InsertData(table, columns, values);
 
     delete values;
     delete columns;
@@ -75,7 +75,21 @@ uint8_t ESP_unit::create_record_in_database() {
 
 }
 
-void ESP_unit::assign_values(string data) {
+void ESP_unit::update_values(string data) {
+    string *command = new string;
+    string *condition = new string;
+
+
+    *condition = "[WHERE ID=" + std::to_string(this->ID) + "]";
+
+    *command = "UPDATE ESP SET IP_ADDRESS=" + this->websocketESP->getIPaddress()
+            + ",NAME=" + this->name + ",TIMESTAMP_LAST_MSG=" + std::to_string(this->timestampOfLastMessage) + *condition;
+
+    this->database->ExecCommand(command);
+
+    delete command;
+    delete condition;
+
 
 
 }
@@ -220,7 +234,27 @@ uint8_t Flower::get_all_record_with_id_esp(vector<string> &data) const {
     return 0;
 }
 
-void Flower::assign_values(string data) {
+void Flower::update_values(string data) {
+
+    string *command = new string;
+    string *condition = new string;
+    string *recipe = new string;
+
+    *recipe = "[" + std::to_string(this->measurementOfFlower.rescipeTemperature) + ","
+                + std::to_string(this->measurementOfFlower.rescipeHumidity) + ","
+                + std::to_string(this->measurementOfFlower.rescipeInsolation) + "]";
+
+    *condition = "[WHERE ID=" + std::to_string(this->ID) + "]";
+
+    *command = "UPDATE PLANT SET ID_ESP=" + std::to_string(this->espID)
+               + ",NAME=" + this->namePlant + ",RECIPE=" + *recipe + *condition;
+
+    this->database->ExecCommand(command);
+
+    delete command;
+    delete condition;
+    delete recipe;
+
 
 
 }
@@ -286,6 +320,30 @@ void Flower::calculate_all_averages() {
     this->measurementOfFlower.avgInsolation = (uint8_t) this->calculate_average(this->measurementOfFlower.vecOfInsolation);
     this->measurementOfFlower.avgTemperature = this->calculate_average(this->measurementOfFlower.vecOfTemperature);
 
+}
+
+void Flower::update_measurement_in_database() {
+
+    std::string temperature = this->make_vector_of_measurement(this->measurementOfFlower.vecOfTemperature);
+    std::string humidity = this->make_vector_of_measurement(this->measurementOfFlower.vecOfHumidity);
+    std::string insolation = this->make_vector_of_measurement(this->measurementOfFlower.vecOfInsolation);
+
+
+
+}
+
+template<typename T>
+std::string Flower::make_vector_of_measurement(const vector<T> &vec) {
+    std::string output = "[";
+
+    for (auto &item : vec){
+        output = output + std::to_string(item) + ",";
+    }
+    output.erase(output.size() - 1);
+    output = output + "]";
+
+
+    return output;
 }
 
 

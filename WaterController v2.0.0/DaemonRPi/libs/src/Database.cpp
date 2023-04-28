@@ -126,5 +126,20 @@ uint8_t Database::SelectData(std::string *command, std::vector<std::string> &dat
     return 0;
 }
 
+void Database::ExecCommand(std::string *command) {
+
+    char *zErrMsg = 0;
+
+    int16_t rc = sqlite3_exec(this->db, command->c_str(), NULL, 0, &zErrMsg);
+
+    if( rc != SQLITE_OK ){
+        fprintf(stderr, "SQL error: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+    } else {
+        fprintf(stdout, "Records updated successfully\n");
+    }
+
+}
+
 
 

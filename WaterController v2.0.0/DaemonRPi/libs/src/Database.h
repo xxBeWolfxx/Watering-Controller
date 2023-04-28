@@ -27,6 +27,7 @@ public:
     uint8_t OpenDatabase(std::string database);
     void CloseDatabase(std::string database);
     uint8_t InsertData(std::string *table, std::string *columns, std::string *value);
+    void ExecCommand(std::string *command);
 
 //    uint8_t Select_all_data(std::string tableName, std::vector<std::string> &data);
     uint8_t SelectData(std::string *command, std::vector<std::string> &data);

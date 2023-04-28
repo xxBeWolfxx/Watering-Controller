@@ -38,7 +38,7 @@ public:
 
     virtual uint8_t get_record(vector<string> &data) = 0;
     virtual uint8_t create_record_in_database() = 0;
-    virtual void assign_values(string data) = 0;
+    virtual void update_values(string data) = 0;
     uint16_t get_id();
 
     std::vector<std::string> split_record_to_seprate_values(std::string record, char symbole);
@@ -61,7 +61,7 @@ struct Measurement{
         rescipeTemperature = avgTemperature = 0.0;
         vecOfHumidity = std::vector<uint8_t>();
         vecOfInsolation = std::vector<uint8_t>();
-        vecOfTemperature = std::vector<uint8_t>();
+        vecOfTemperature = std::vector<float>();
     };
 
 };
@@ -70,9 +70,11 @@ struct Measurement{
 class Flower : public Record{
 private:
     uint16_t espID;
-
-
     Measurement measurementOfFlower;
+
+    void calculate_all_averages();
+    template<typename T>
+    std::string make_vector_of_measurement(const std::vector<T> &vec);
 
 public:
     uint16_t id;
@@ -85,11 +87,12 @@ public:
     uint8_t get_record(vector<string> &data) override;
     uint8_t get_all_record_with_id_esp(vector<string> &data) const;
     uint8_t create_record_in_database() override;
-    void assign_values(string data) override;
+    void update_values(string data) override;
+    void update_measurement_in_database();
 
     void get_recipe(std::string input);
 
-    void calculate_all_averages();
+
 
     template<typename T>
     static float calculate_average(const std::vector<T> &vec);
@@ -114,7 +117,7 @@ public:
 
     uint8_t get_record(vector<string> &data) override;
     uint8_t create_record_in_database() override;
-    void assign_values(string data) override;
+    void update_values(string data) override;
 
     bool check_message_status();
     void validate_incoming_messages();
