@@ -28,16 +28,16 @@ private:
     beast::flat_buffer buffer;
 
     bool state;
-    std::string content;
+
     std::string clientIPaddress;
 
 
 public:
     net::ip::address address = {};
     uint32_t port;
+    std::string content;
 
     bool new_message_appeared;
-
 
     explicit WebsocketService(tcp::socket&& socket);
     ~WebsocketService();

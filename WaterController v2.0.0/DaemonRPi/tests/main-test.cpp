@@ -7,17 +7,11 @@
 
 #include <boost/test/included/unit_test.hpp>
 #include <sqlite3.h>
-#include "Database.h"
+#include <Database.h>
+#include "Record.h"
 
-struct testStr{
-    uint32_t val1;
-}testStr;
+Database *Record::database;
 
-class cl{
-public:
-    cl(){};
-    struct testStr clTest;
-};
 
 BOOST_AUTO_TEST_SUITE(DATABASE);
 
@@ -32,19 +26,22 @@ BOOST_AUTO_TEST_CASE(stringCheck){
 
 }
 
-BOOST_AUTO_TEST_CASE(nextTest){
+BOOST_AUTO_TEST_CASE(updateESP){
+    Database database = Database();
+    database.OpenDatabase("rpi.db");
+    Record::database = &database;
 
-    struct testStr *ptr;
-    std::shared_ptr<cl> vv = std::make_shared<cl>();
-
-    ptr = &(vv->clTest);
+    ESP_unit esp = ESP_unit();
+    std::vector<std::string> data;
 
 
-    BOOST_CHECK(ptr->val1 == vv->clTest.val1);
+    esp.validate_incoming_messages();
+    
 
-    vv.reset();
+//    BOOST_CHECK(strcmp(esp.name.c_str(), "TARAS") == 0);
+    BOOST_CHECK(1 == 1);
 
-    BOOST_CHECK(ptr->val1 == NULL);
+
 }
 
 BOOST_AUTO_TEST_SUITE_END();

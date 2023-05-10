@@ -8,7 +8,6 @@
 #include <cstdint>
 #include <ctime>
 #include <vector>
-#include <list>
 #include "Database.h"
 #include "WebsocketService.h"
 #include <boost/property_tree/ptree.hpp>
@@ -38,7 +37,7 @@ public:
 
     virtual uint8_t get_record(vector<string> &data) = 0;
     virtual uint8_t create_record_in_database() = 0;
-    virtual void update_values(string data) = 0;
+    virtual void update_values() = 0;
     uint16_t get_id();
 
     std::vector<std::string> split_record_to_seprate_values(std::string record, char symbole);
@@ -56,6 +55,8 @@ struct Measurement{
     std::vector<float> vecOfTemperature;
     std::vector<uint8_t> vecOfInsolation;
 
+
+
     Measurement(){
         rescipeHumidity = rescipeInsolation = avgHumidity = avgInsolation = 0;
         rescipeTemperature = avgTemperature = 0.0;
@@ -70,15 +71,19 @@ struct Measurement{
 class Flower : public Record{
 private:
     uint16_t espID;
-    Measurement measurementOfFlower;
 
-    void calculate_all_averages();
+
+
+    template<typename T>
+    static float calculate_average(const std::vector<T> &vec);
     template<typename T>
     std::string make_vector_of_measurement(const std::vector<T> &vec);
+    template<typename T>
+    std::vector<T> read_vector_from_database(std::string &str, bool ifInt);
 
 public:
-    uint16_t id;
     std::string namePlant;
+    Measurement measurementOfFlower;
 
     Flower();
     explicit Flower(uint16_t ID) : espID(ID) {};
@@ -87,15 +92,18 @@ public:
     uint8_t get_record(vector<string> &data) override;
     uint8_t get_all_record_with_id_esp(vector<string> &data) const;
     uint8_t create_record_in_database() override;
-    void update_values(string data) override;
+    void update_values() override;
+
+    void create_measurement_in_database();
     void update_measurement_in_database();
+    void get_measurement_from_database();
 
     void get_recipe(std::string input);
+    void set_ID(uint16_t id);
 
 
+    void calculate_all_averages();
 
-    template<typename T>
-    static float calculate_average(const std::vector<T> &vec);
 
 
 
@@ -104,26 +112,28 @@ public:
 class ESP_unit : public Record{
 private:
     ESP_STATUS status;
-    std::string name;
+
 
 public:
+    std::string name;
     time_t timestampOfLastMessage;
 
     std::shared_ptr<WebsocketService> websocketESP;
-    std::list<Flower> vectorOfFlowers;
+    std::vector<Flower> vectorOfFlowers;
 
     ESP_unit();
     ~ESP_unit();
 
     uint8_t get_record(vector<string> &data) override;
     uint8_t create_record_in_database() override;
-    void update_values(string data) override;
+    void update_values() override;
 
     bool check_message_status();
     void validate_incoming_messages();
     void get_values_from_json(std::vector<std::string> parameters, std::vector<std::string> *containerForValues);
     void get_all_flowers_from_database();
     void assign_values_to_vector_flowers(vector<string> &data);
+    void assign_id(uint16_t id);
 
 };
 
