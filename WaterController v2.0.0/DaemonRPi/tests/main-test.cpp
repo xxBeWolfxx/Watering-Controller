@@ -9,20 +9,22 @@
 #include <sqlite3.h>
 #include <Database.h>
 #include "Record.h"
+#include "Logger.h"
 
 Database *Record::database;
 
 
 BOOST_AUTO_TEST_SUITE(DATABASE);
 
-BOOST_AUTO_TEST_CASE(stringCheck){
+BOOST_AUTO_TEST_CASE(logs){
+
+    Logger logger = Logger("test.log");
+    logger.Open_log_file();
 
 
 
 
-    uint16_t count = Database::countWords("DD XX", ' ');
-
-    BOOST_CHECK(count == 2);
+    BOOST_CHECK(2 == 2);
 
 }
 

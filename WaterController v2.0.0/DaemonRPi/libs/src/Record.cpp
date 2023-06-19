@@ -126,6 +126,7 @@ void ESP_unit::validate_incoming_messages() {
             }
             else{
                 this->status = ESP_STATUS::IN_DATABASE;
+                this->websocketESP->new_message_appeared = false;
             }
 
 
@@ -140,6 +141,9 @@ void ESP_unit::validate_incoming_messages() {
             break;
         }
         case NEW_ELEMENT: {
+
+
+
             this->create_record_in_database();
             this->status = ESP_STATUS::WORKING;
             break;
@@ -202,6 +206,14 @@ void ESP_unit::assign_values_to_vector_flowers(vector<string> &data) {
 
 void ESP_unit::assign_id(uint16_t id) {
     this->ID = id;
+}
+
+void ESP_unit::get_settings_from_ESP_module() {
+    std::vector<std::string> parameters = { "ID", "NAME" };
+    std::vector<std::string> values;
+    this->get_values_from_json(parameters, &values);
+
+
 }
 
 

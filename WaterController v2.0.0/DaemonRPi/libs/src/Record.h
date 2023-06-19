@@ -128,6 +128,7 @@ public:
     uint8_t create_record_in_database() override;
     void update_values() override;
 
+    void get_settings_from_ESP_module();
     bool check_message_status();
     void validate_incoming_messages();
     void get_values_from_json(std::vector<std::string> parameters, std::vector<std::string> *containerForValues);
