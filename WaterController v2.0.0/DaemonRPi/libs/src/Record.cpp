@@ -126,6 +126,7 @@ void ESP_unit::validate_incoming_messages() {
             }
             else{
                 this->status = ESP_STATUS::IN_DATABASE;
+                this->websocketESP->sy_write("{\"STATUS\": 201}");
                 this->websocketESP->new_message_appeared = false;
             }
 
@@ -427,6 +428,10 @@ void Flower::get_measurement_from_database() {
     *comand = "SELECT * FROM MEASUREMENT WHERE ID_PLANT=" + to_string(this->ID);
     this->database->SelectData(comand, data);
     delete comand;
+
+    if (data.empty()){
+        return;
+    }
 
     std::vector<std::string> output = this->split_record_to_seprate_values(data[0], '/');
     this->measurementOfFlower.avgHumidity = std::stoi(output[1]);
