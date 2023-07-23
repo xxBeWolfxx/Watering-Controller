@@ -52,7 +52,7 @@ public:
     void echo();
     void asy_write(std::string msg);
     void sy_write(std::string msg);
-
+    void asyn_close();
 
 };
 

@@ -39,6 +39,10 @@ Database::Database() {
 
 }
 
+Database::Database(std::string database){
+    this->dbName = database;
+}
+
 
 uint8_t Database::OpenDatabase(std::string database) {
     uint8_t rc = 0;
@@ -63,6 +67,7 @@ void Database::CloseDatabase(std::string database) {
 
 uint8_t Database::InsertData(std::string *table, std::string *columns, std::string *value){ // int16_t coordinates[], int timestamp
 
+    this->OpenDatabase(this->dbName);
 
     std::string *record = new std::string();
     char *zErrMsg = 0;
@@ -77,6 +82,8 @@ uint8_t Database::InsertData(std::string *table, std::string *columns, std::stri
     } else {
         fprintf(stdout, "Records created successfully\n");
     }
+
+    this->CloseDatabase(this->dbName);
 
     delete record;
 
@@ -102,6 +109,8 @@ Database::~Database() {
 
 uint8_t Database::SelectData(std::string *command, std::vector<std::string> &data) {
 
+    this->OpenDatabase(this->dbName);
+
     sqlite3_stmt *stmt;
     std::string temp = "";
 
@@ -123,12 +132,16 @@ uint8_t Database::SelectData(std::string *command, std::vector<std::string> &dat
 
     sqlite3_finalize(stmt);
 
+    this->CloseDatabase(this->dbName);
+
     return 0;
 }
 
 void Database::ExecCommand(std::string *command) {
 
     char *zErrMsg = 0;
+
+    this->OpenDatabase(this->dbName);
 
     int16_t rc = sqlite3_exec(this->db, command->c_str(), NULL, 0, &zErrMsg);
 
@@ -138,6 +151,8 @@ void Database::ExecCommand(std::string *command) {
     } else {
         fprintf(stdout, "Records updated successfully\n");
     }
+
+    this->CloseDatabase(this->dbName);
 
 }
 

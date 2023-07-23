@@ -122,7 +122,7 @@ void ESP_unit::validate_incoming_messages() {
 
             if(data.empty()){
                 this->status = ESP_STATUS::NEW_ELEMENT;
-                this->websocketESP->sy_write("{\"STATUS\": 101}");
+                this->websocketESP->sy_write("{\"STATUS\": 401}");
             }
             else{
                 this->status = ESP_STATUS::IN_DATABASE;
@@ -136,20 +136,20 @@ void ESP_unit::validate_incoming_messages() {
 
         case IN_DATABASE: {
             this->get_all_flowers_from_database();
-            this->vectorOfFlowers[0].get_measurement_from_database();
             this->status = ESP_STATUS::WORKING;
             break;
         }
         case NEW_ELEMENT: {
 
+            this->create_log();
+            this->websocketESP->setState(false);
+            this->websocketESP->new_message_appeared = false;
 
-
-            this->create_record_in_database();
             this->status = ESP_STATUS::WORKING;
+
             break;
         }
         case WORKING: {
-            std::uint8_t x = 10;
             this->websocketESP->new_message_appeared = false;
             sleep(2);
             break;
@@ -176,7 +176,11 @@ void ESP_unit::get_all_flowers_from_database() {
 
     tempFlower.get_all_record_with_id_esp(data);
     this->assign_values_to_vector_flowers(data);
-    uint8_t test = 0;
+
+    for (Flower &item : this->vectorOfFlowers){
+        item.get_measurement_from_database();
+    }
+
 
 
 
@@ -212,6 +216,24 @@ void ESP_unit::get_settings_from_ESP_module() {
     std::vector<std::string> parameters = { "ID", "NAME" };
     std::vector<std::string> values;
     this->get_values_from_json(parameters, &values);
+
+
+}
+
+void ESP_unit::create_log() {
+    string *values = new string;
+    string *columns = new string;
+    string *table = new string;
+
+    *values = "'" + this->name + "','" + this->websocketESP->getIPaddress() + "'," + to_string(this->timestampOfLastMessage); //add timestamp do websocketa
+    *columns = "ESP_NAME, ESP_IP, TIMESTAMP";
+    *table = "LOGESP";
+
+    this->database->InsertData(table, columns, values);
+
+    delete values;
+    delete columns;
+    delete table;
 
 
 }

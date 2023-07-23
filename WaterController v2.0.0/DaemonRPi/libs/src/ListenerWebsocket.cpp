@@ -36,6 +36,7 @@ void ListenerWebsocket::delete_all_not_working_ESP() const {
         WebsocketService *item = esp->websocketESP.get();
 
         if(!item->getState()){
+            esp->websocketESP->asyn_close();
             esp->websocketESP.reset();
             ptr.reset();
             itemFound = true;

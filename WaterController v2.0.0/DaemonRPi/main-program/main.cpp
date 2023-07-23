@@ -32,8 +32,6 @@ int main() {
     shared_ptr<ListenerWebsocket> ptr_ListenerWebsocket = std::make_shared<ListenerWebsocket>(ioc, "127.0.0.1",config.config.port);
     ListenerWebsocket *listiener = ptr_ListenerWebsocket.get();
 
-
-    vector<string> data;
     Database database = Database();
 
 //    database.Select_all_data("PLANT", data);
@@ -50,8 +48,6 @@ int main() {
         switch (status) {
 
             case Configuration::STARTING:{
-                database.OpenDatabase("rpi.db");
-
 
                 status = Configuration::OPEN_WEBSOCKET;
                 break;

@@ -14,6 +14,8 @@ private:
     const std::string flower_table = "flowerTable";
     const std::string measurements_table = "measurementsTable";
 
+    uint8_t OpenDatabase(std::string database);
+    void CloseDatabase(std::string database);
 
     sqlite3 *db;
     std::string dbName = "rpi.db";
@@ -22,10 +24,9 @@ public:
 
 
     Database();
+    Database(std::string database);
     ~Database();
 
-    uint8_t OpenDatabase(std::string database);
-    void CloseDatabase(std::string database);
     uint8_t InsertData(std::string *table, std::string *columns, std::string *value);
     void ExecCommand(std::string *command);
 
