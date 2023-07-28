@@ -112,6 +112,9 @@ void ESP_unit::validate_incoming_messages() {
                 this->ID = (uint16_t) std::stoi(values[0]);
                 this->name = values[1];
             }
+            else{
+
+            }
 
             this->status = ESP_STATUS::CHECKING_DATABASE;
             break;
@@ -122,7 +125,7 @@ void ESP_unit::validate_incoming_messages() {
 
             if(data.empty()){
                 this->status = ESP_STATUS::NEW_ELEMENT;
-                this->websocketESP->sy_write("{\"STATUS\": 401}");
+                this->websocketESP->sy_write("{\"STATUS\": 404}");
             }
             else{
                 this->status = ESP_STATUS::IN_DATABASE;
@@ -142,17 +145,35 @@ void ESP_unit::validate_incoming_messages() {
         }
         case NEW_ELEMENT: {
 
-            this->create_log();
+            this->create_log("NEW_ELEMENT");
             this->websocketESP->setState(false);
             this->websocketESP->new_message_appeared = false;
 
-            this->status = ESP_STATUS::WORKING;
+            this->status = ESP_STATUS::CLOSE;
 
             break;
         }
         case WORKING: {
             this->websocketESP->new_message_appeared = false;
+
+            // SPRAWDZENIE TYPU WIADOMOŚCI
+            // ODCZYTANIE POMIAROW
+            // WPISANIE ICH DO TABLIC
+            // UAKTUALNIENIE WARTOŚCI ŚREDNIEJ
+            // WPISANIE DO BAZY DANYCH
+
+
             sleep(2);
+            break;
+        }
+        case ERROR:{
+
+            this->create_log("ERROR");
+            this->websocketESP->setState(false);
+            this->websocketESP->new_message_appeared = false;
+
+            this->status = ESP_STATUS::CLOSE;
+
             break;
         }
     }
@@ -166,7 +187,11 @@ void ESP_unit::get_values_from_json(std::vector<std::string> parameters, std::ve
     boost::property_tree::read_json(message, pt);
 
     for (std::string param : parameters){
-        containerForValues->push_back(pt.get<string>(param));
+        auto it = pt.find(param);
+        if( it != pt.not_found() ) {
+            std::string value = pt.get<string>(param);
+            containerForValues->push_back(std::move(value));
+        }
     }
 
 }
@@ -221,13 +246,15 @@ void ESP_unit::get_settings_from_ESP_module() {
 
 }
 
-void ESP_unit::create_log() {
+void ESP_unit::create_log(std::string type) {
     string *values = new string;
     string *columns = new string;
     string *table = new string;
 
-    *values = "'" + this->name + "','" + this->websocketESP->getIPaddress() + "'," + to_string(this->timestampOfLastMessage); //add timestamp do websocketa
-    *columns = "ESP_NAME, ESP_IP, TIMESTAMP";
+    *values = "'" + this->name + "','" + this->websocketESP->getIPaddress()
+            + "'," + to_string(this->timestampOfLastMessage)
+            + ",'" + type + "'" ; //add timestamp do websocketa
+    *columns = "ESP_NAME, ESP_IP, TIMESTAMP", "TYPE";
     *table = "LOGESP";
 
     this->database->InsertData(table, columns, values);

@@ -23,6 +23,7 @@ enum ESP_STATUS{
     IN_DATABASE,
     NEW_ELEMENT,
     WORKING,
+    ERROR,
     CLOSE
 };
 
@@ -135,7 +136,7 @@ public:
     void get_values_from_json(std::vector<std::string> parameters, std::vector<std::string> *containerForValues);
     void get_all_flowers_from_database();
     void assign_values_to_vector_flowers(vector<string> &data);
-    void create_log();
+    void create_log(std::string type);
     void assign_id(uint16_t id);
 
 };

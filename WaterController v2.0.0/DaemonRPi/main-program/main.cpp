@@ -29,7 +29,7 @@ int main() {
 
 
 
-    shared_ptr<ListenerWebsocket> ptr_ListenerWebsocket = std::make_shared<ListenerWebsocket>(ioc, "127.0.0.1",config.config.port);
+    shared_ptr<ListenerWebsocket> ptr_ListenerWebsocket = std::make_shared<ListenerWebsocket>(ioc, config.config.ipAddress ,config.config.port);
     ListenerWebsocket *listiener = ptr_ListenerWebsocket.get();
 
     Database database = Database();

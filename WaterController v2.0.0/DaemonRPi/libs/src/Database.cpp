@@ -89,20 +89,6 @@ uint8_t Database::InsertData(std::string *table, std::string *columns, std::stri
 
 }
 
-//uint8_t Database::Select_all_data(std::string tableName, std::vector<std::string> &data) {
-//    std::string *record = new std::string();
-//    *record = "SELECT * from " + tableName;
-//
-//    this->SelectData(record, data);
-//
-//
-//    delete record;
-//
-//}
-
-
-
-
 Database::~Database() {
     sqlite3_close(db);
 }
