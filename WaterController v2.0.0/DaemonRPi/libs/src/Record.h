@@ -74,7 +74,7 @@ class Flower : public Record{
 private:
     uint16_t espID;
 
-
+    bool newData = false;
 
     template<typename T>
     static float calculate_average(const std::vector<T> &vec);
@@ -101,6 +101,8 @@ public:
     void get_measurement_from_database();
 
     void get_recipe(std::string input);
+    bool get_status_new_data();
+    void set_flag_data(bool flag);
     void set_ID(uint16_t id);
 
 
@@ -130,14 +132,14 @@ public:
     uint8_t create_record_in_database() override;
     void update_values() override;
 
-    void get_settings_from_ESP_module();
     bool check_message_status();
     void validate_incoming_messages();
     void get_values_from_json(std::vector<std::string> parameters, std::vector<std::string> *containerForValues);
     void get_all_flowers_from_database();
     void assign_values_to_vector_flowers(vector<string> &data);
     void create_log(std::string type);
-    void assign_id(uint16_t id);
+
+    int8_t receive_new_measurment();
 
 };
 

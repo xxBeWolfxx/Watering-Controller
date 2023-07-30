@@ -156,6 +156,12 @@ void ESP_unit::validate_incoming_messages() {
         case WORKING: {
             this->websocketESP->new_message_appeared = false;
 
+
+            int8_t retVal = this->receive_new_measurment();
+            if (retVal > -1){
+
+            }
+
             // SPRAWDZENIE TYPU WIADOMOŚCI
             // ODCZYTANIE POMIAROW
             // WPISANIE ICH DO TABLIC
@@ -205,6 +211,7 @@ void ESP_unit::get_all_flowers_from_database() {
 
     for (Flower &item : this->vectorOfFlowers){
         item.get_measurement_from_database();
+
     }
 
 
@@ -224,7 +231,6 @@ void ESP_unit::assign_values_to_vector_flowers(vector<string> &data) {
         tempFlower.get_recipe(values[3]);
 
 
-
         this->vectorOfFlowers.push_back(std::move(tempFlower));
 
 
@@ -234,14 +240,44 @@ void ESP_unit::assign_values_to_vector_flowers(vector<string> &data) {
 
 }
 
-void ESP_unit::assign_id(uint16_t id) {
-    this->ID = id;
-}
+int8_t ESP_unit::receive_new_measurment() {
 
-void ESP_unit::get_settings_from_ESP_module() {
-    std::vector<std::string> parameters = { "ID", "NAME" };
+    std::vector<std::string> parameters = { "CODE" };
     std::vector<std::string> values;
     this->get_values_from_json(parameters, &values);
+    if (values.empty()) return -1;
+
+    uint16_t typeCase = (uint16_t) std::stoi(values[0]);
+    values.clear();
+    parameters.clear();
+
+    parameters = { "HUM", "TEMP", "ISO" };
+    this->get_values_from_json(parameters, &values);
+    if(values.size() < 3) return -1;
+
+    Measurement *handleMeasurment;
+
+    switch(typeCase){
+        case 101:{
+            handleMeasurment = &this->vectorOfFlowers[0].measurementOfFlower;
+            break;
+        }
+        case 102:{
+            handleMeasurment = &this->vectorOfFlowers[1].measurementOfFlower;
+            break;
+        }
+        default:{
+            break;
+        }
+
+    }
+
+    handleMeasurment->vecOfHumidity.push_back(std::stoi(values[0]));
+    handleMeasurment->vecOfTemperature.push_back(std::stof(values[1]));
+    handleMeasurment->vecOfInsolation.push_back(std::stoi(values[2]));
+
+    return 0;
+
 
 
 }
@@ -254,7 +290,7 @@ void ESP_unit::create_log(std::string type) {
     *values = "'" + this->name + "','" + this->websocketESP->getIPaddress()
             + "'," + to_string(this->timestampOfLastMessage)
             + ",'" + type + "'" ; //add timestamp do websocketa
-    *columns = "ESP_NAME, ESP_IP, TIMESTAMP", "TYPE";
+    *columns = "ESP_NAME, ESP_IP, TIMESTAMP, TYPE";
     *table = "LOGESP";
 
     this->database->InsertData(table, columns, values);
@@ -472,9 +508,17 @@ void Flower::get_measurement_from_database() {
 
 
 
+//TODO missing calculating avg number 
 
 
+}
 
+bool Flower::get_status_new_data() {
+    return this->newData;
+}
+
+void Flower::set_flag_data(bool flag){
+    this->newData = flag;
 }
 
 template<typename T>

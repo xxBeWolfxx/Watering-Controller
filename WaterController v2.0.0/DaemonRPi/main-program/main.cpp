@@ -70,6 +70,12 @@ int main() {
                     if (item->check_message_status()){
                         item->validate_incoming_messages();
                     }
+                    for( Flower &itemFlower : item->vectorOfFlowers){
+                        if(itemFlower.get_status_new_data()){
+                            itemFlower.update_measurement_in_database();
+                        }
+
+                    }
                 }
 
                 if(!temp.empty())
