@@ -94,7 +94,7 @@ void ESP_unit::update_values() {
 
 }
 
-bool ESP_unit::check_message_status() {
+bool ESP_unit::check_message_appearance() {
     return this->websocketESP->new_message_appeared;
 }
 
@@ -124,7 +124,7 @@ void ESP_unit::validate_incoming_messages() {
             this->get_record(data);
 
             if(data.empty()){
-                this->status = ESP_STATUS::NEW_ELEMENT;
+                this->status = ESP_STATUS::MISSING_ELEMENT;
                 this->websocketESP->sy_write("{\"STATUS\": 404}");
             }
             else{
@@ -143,9 +143,9 @@ void ESP_unit::validate_incoming_messages() {
             this->status = ESP_STATUS::WORKING;
             break;
         }
-        case NEW_ELEMENT: {
+        case MISSING_ELEMENT: {
 
-            this->create_log("NEW_ELEMENT");
+            this->create_log("MISSING_ELEMENT");
             this->websocketESP->setState(false);
             this->websocketESP->new_message_appeared = false;
 
@@ -162,9 +162,6 @@ void ESP_unit::validate_incoming_messages() {
 
             }
 
-            // SPRAWDZENIE TYPU WIADOMOŚCI
-            // ODCZYTANIE POMIAROW
-            // WPISANIE ICH DO TABLIC
             // UAKTUALNIENIE WARTOŚCI ŚREDNIEJ
             // WPISANIE DO BAZY DANYCH
 
@@ -244,6 +241,9 @@ int8_t ESP_unit::receive_new_measurment() {
 
     std::vector<std::string> parameters = { "CODE" };
     std::vector<std::string> values;
+    Measurement *handleMeasurment;
+    Flower *handleFlower;
+
     this->get_values_from_json(parameters, &values);
     if (values.empty()) return -1;
 
@@ -255,15 +255,14 @@ int8_t ESP_unit::receive_new_measurment() {
     this->get_values_from_json(parameters, &values);
     if(values.size() < 3) return -1;
 
-    Measurement *handleMeasurment;
 
     switch(typeCase){
         case 101:{
-            handleMeasurment = &this->vectorOfFlowers[0].measurementOfFlower;
+            handleFlower = &this->vectorOfFlowers[0];
             break;
         }
         case 102:{
-            handleMeasurment = &this->vectorOfFlowers[1].measurementOfFlower;
+            handleFlower = &this->vectorOfFlowers[1].;
             break;
         }
         default:{
@@ -272,9 +271,12 @@ int8_t ESP_unit::receive_new_measurment() {
 
     }
 
+    handleMeasurment = &handleFlower->measurementOfFlower;
     handleMeasurment->vecOfHumidity.push_back(std::stoi(values[0]));
     handleMeasurment->vecOfTemperature.push_back(std::stof(values[1]));
     handleMeasurment->vecOfInsolation.push_back(std::stoi(values[2]));
+
+    handleFlower->set_flag_data(true);
 
     return 0;
 
@@ -472,6 +474,8 @@ void Flower::update_measurement_in_database() {
 
     this->database->ExecCommand(command);
 
+    this->set_flag_data(false);
+
     delete command;
     delete condition;
 
@@ -521,6 +525,18 @@ void Flower::set_flag_data(bool flag){
     this->newData = flag;
 }
 
+void Flower::check_quantity_of_measurments(){
+    if ( this->measurementOfFlower.vecOfInsolation.size() > (this->limitOfMeasuments - 1) ){
+
+    }
+
+    if ( this->measurementOfFlower.vecOfHumidity.size() > (this->limitOfMeasuments - 1) ){
+        uint8_t lastElement = this->measurementOfFlower.vecOfInsolation[this->limitOfMeasuments];
+        this->measurementOfFlower.vecOfInsolation.clear();
+        this->measurementOfFlower.vecOfInsolation.push_back(lastElement);
+    }
+}
+
 template<typename T>
 std::vector<T> Flower::read_vector_from_database(std::string &str, bool ifInt) {
     str = str.substr(1, str.size() - 2);
@@ -556,5 +572,19 @@ std::string Flower::make_vector_of_measurement(const vector<T> &vec) {
 }
 
 
+std::vector<float> Measurement::clearMeasurmentVector(std::vector<float> &vec, uint8_t limit) {
+    float lastElement = vec[limit];
+    vec.clear();
+    vec.push_back(lastElement);
 
+    return vec;
 
+}
+
+std::vector<uint8_t> Measurement::clearMeasurmentVector(std::vector<uint8_t> &vec, uint8_t limit) {
+    uint8_t lastElement = vec[limit];
+    vec.clear();
+    vec.push_back(lastElement);
+
+    return vec;
+}

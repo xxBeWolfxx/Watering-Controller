@@ -29,9 +29,9 @@ public:
 
     enum codeCycle{
         STARTING,
-        OPEN_DATABASE,
         OPEN_WEBSOCKET,
         VALIDATION_INCOMING_MSG,
+        CHECK_MEASURMENTS,
         SENDING_TO_ESP
     };
 

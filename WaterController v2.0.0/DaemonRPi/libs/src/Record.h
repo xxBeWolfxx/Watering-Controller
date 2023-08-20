@@ -21,7 +21,7 @@ enum ESP_STATUS{
     INIT = 0,
     CHECKING_DATABASE,
     IN_DATABASE,
-    NEW_ELEMENT,
+    MISSING_ELEMENT,
     WORKING,
     ERROR,
     CLOSE
@@ -57,7 +57,8 @@ struct Measurement{
     std::vector<float> vecOfTemperature;
     std::vector<uint8_t> vecOfInsolation;
 
-
+    std::vector<uint8_t > clearMeasurmentVector(std::vector<uint8_t> &vec, uint8_t limit);
+    std::vector<float> clearMeasurmentVector(std::vector<float> &vec, uint8_t limit);
 
     Measurement(){
         rescipeHumidity = rescipeInsolation = avgHumidity = avgInsolation = 0;
@@ -73,6 +74,7 @@ struct Measurement{
 class Flower : public Record{
 private:
     uint16_t espID;
+    uint16_t limitOfMeasuments = 41;
 
     bool newData = false;
 
@@ -105,7 +107,7 @@ public:
     void set_flag_data(bool flag);
     void set_ID(uint16_t id);
 
-
+    void check_quantity_of_measurments();
     void calculate_all_averages();
 
 
@@ -132,7 +134,7 @@ public:
     uint8_t create_record_in_database() override;
     void update_values() override;
 
-    bool check_message_status();
+    bool check_message_appearance();
     void validate_incoming_messages();
     void get_values_from_json(std::vector<std::string> parameters, std::vector<std::string> *containerForValues);
     void get_all_flowers_from_database();
@@ -140,6 +142,7 @@ public:
     void create_log(std::string type);
 
     int8_t receive_new_measurment();
+    void manage_the_flower_measurments();
 
 };
 

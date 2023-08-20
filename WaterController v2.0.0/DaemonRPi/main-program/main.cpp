@@ -65,9 +65,8 @@ int main() {
                 listiener->delete_all_not_working_ESP();
                 vector<string> temp;
 
-
                 for(auto &item : vecESP){
-                    if (item->check_message_status()){
+                    if (item->check_message_appearance()){
                         item->validate_incoming_messages();
                     }
                     for( Flower &itemFlower : item->vectorOfFlowers){
@@ -78,19 +77,32 @@ int main() {
                     }
                 }
 
-                if(!temp.empty())
-                {
-                    cout << "STATUS: " << status << endl;
+                status = Configuration::CHECK_MEASURMENTS;
+
+                break;
+            }
+
+            case Configuration::CHECK_MEASURMENTS:{
+                for(auto &item : vecESP){
+                    for (auto &tempFlower : item->vectorOfFlowers){
+                        if (tempFlower.get_status_new_data()){
+                            tempFlower.m
+                        }
+                    }
                 }
+                /*
+                 * CALCULATE AVG
+                 * SAVE TO DATABASE
+                 *
+                 */
 
 
-//                status = (Configuration::codeCycle)(status + 1);
+                status = Configuration::VALIDATION_INCOMING_MSG;
+
                 break;
             }
 
 
-            case Configuration::OPEN_DATABASE:
-                break;
             case Configuration::SENDING_TO_ESP:
                 break;
         }
