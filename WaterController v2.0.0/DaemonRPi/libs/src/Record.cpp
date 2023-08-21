@@ -262,7 +262,7 @@ int8_t ESP_unit::receive_new_measurment() {
             break;
         }
         case 102:{
-            handleFlower = &this->vectorOfFlowers[1].;
+            handleFlower = &this->vectorOfFlowers[1];
             break;
         }
         default:{
@@ -511,10 +511,6 @@ void Flower::get_measurement_from_database() {
 
 
 
-
-//TODO missing calculating avg number 
-
-
 }
 
 bool Flower::get_status_new_data() {
@@ -525,15 +521,23 @@ void Flower::set_flag_data(bool flag){
     this->newData = flag;
 }
 
-void Flower::check_quantity_of_measurments(){
-    if ( this->measurementOfFlower.vecOfInsolation.size() > (this->limitOfMeasuments - 1) ){
-
+void Flower::check_quantity_of_measurments() {
+    if (this->measurementOfFlower.vecOfInsolation.size() > (this->limitOfMeasuments - 1)) {
+        this->measurementOfFlower.avgInsolation = this->calculate_average(this->measurementOfFlower.vecOfInsolation);
+        this->measurementOfFlower.clearMeasurmentVector(this->measurementOfFlower.vecOfInsolation,
+                                                        this->limitOfMeasuments);
     }
 
-    if ( this->measurementOfFlower.vecOfHumidity.size() > (this->limitOfMeasuments - 1) ){
-        uint8_t lastElement = this->measurementOfFlower.vecOfInsolation[this->limitOfMeasuments];
-        this->measurementOfFlower.vecOfInsolation.clear();
-        this->measurementOfFlower.vecOfInsolation.push_back(lastElement);
+    if (this->measurementOfFlower.vecOfHumidity.size() > (this->limitOfMeasuments - 1)) {
+        this->measurementOfFlower.avgHumidity = this->calculate_average(this->measurementOfFlower.vecOfHumidity);
+        this->measurementOfFlower.clearMeasurmentVector(this->measurementOfFlower.vecOfHumidity,
+                                                        this->limitOfMeasuments);
+    }
+
+    if (this->measurementOfFlower.vecOfTemperature.size() > (this->limitOfMeasuments - 1)) {
+        this->measurementOfFlower.avgTemperature = this->calculate_average(this->measurementOfFlower.vecOfTemperature);
+        this->measurementOfFlower.clearMeasurmentVector(this->measurementOfFlower.vecOfTemperature,
+                                                        this->limitOfMeasuments);
     }
 }
 
@@ -562,7 +566,10 @@ std::string Flower::make_vector_of_measurement(const vector<T> &vec) {
     std::string output = "[";
 
     for (auto &item : vec){
-        output = output + std::to_string(item) + ",";
+        std::stringstream stream;
+        stream << std::fixed << std::setprecision(2) << (float) item;
+        std::string str_number = stream.str();
+        output = output + str_number + ",";
     }
     output.erase(output.size() - 1);
     output = output + "]";

@@ -72,6 +72,7 @@ int main() {
                     for( Flower &itemFlower : item->vectorOfFlowers){
                         if(itemFlower.get_status_new_data()){
                             itemFlower.update_measurement_in_database();
+                            itemFlower.set_flag_data(false);
                         }
 
                     }
@@ -86,7 +87,8 @@ int main() {
                 for(auto &item : vecESP){
                     for (auto &tempFlower : item->vectorOfFlowers){
                         if (tempFlower.get_status_new_data()){
-                            tempFlower.m
+                            tempFlower.check_quantity_of_measurments();
+                            tempFlower.update_measurement_in_database();
                         }
                     }
                 }

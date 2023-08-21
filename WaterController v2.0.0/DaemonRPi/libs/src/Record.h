@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <ctime>
 #include <vector>
+#include <iomanip>
 #include "Database.h"
 #include "WebsocketService.h"
 #include <boost/property_tree/ptree.hpp>
@@ -79,7 +80,7 @@ private:
     bool newData = false;
 
     template<typename T>
-    static float calculate_average(const std::vector<T> &vec);
+    float calculate_average(const std::vector<T> &vec);
     template<typename T>
     std::string make_vector_of_measurement(const std::vector<T> &vec);
     template<typename T>
