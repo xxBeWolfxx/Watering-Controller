@@ -72,12 +72,10 @@ struct Measurement{
 };
 
 
-class Flower : public Record{
+class FlowerEntity : public Record{
 private:
+    
     uint16_t espID;
-    uint16_t limitOfMeasuments = 41;
-
-    bool newData = false;
 
     template<typename T>
     float calculate_average(const std::vector<T> &vec);
@@ -90,9 +88,9 @@ public:
     std::string namePlant;
     Measurement measurementOfFlower;
 
-    Flower();
-    explicit Flower(uint16_t ID) : espID(ID) {};
-    ~Flower();
+    FlowerEntity();
+    explicit FlowerEntity(uint16_t ID) : espID(ID) {};
+    ~FlowerEntity();
 
     uint8_t get_record(vector<string> &data) override;
     uint8_t get_all_record_with_id_esp(vector<string> &data) const;
@@ -102,8 +100,21 @@ public:
     void create_measurement_in_database();
     void update_measurement_in_database();
     void get_measurement_from_database();
-
     void get_recipe(std::string input);
+
+
+};
+
+class Flower{
+
+private:
+    uint16_t espID;
+    uint16_t limitOfMeasuments = 41;
+
+    bool newData = false;
+    FlowerEntity storageEntity;
+
+public:
     bool get_status_new_data();
     void set_flag_data(bool flag);
     void set_ID(uint16_t id);
@@ -112,21 +123,17 @@ public:
     void calculate_all_averages();
 
 
-
-
 };
 
 class ESP_unit : public Record{
 private:
     ESP_STATUS status;
+    uint16_t ID;
+    std::string ipAddress;
 
 
 public:
-    std::string name;
-    time_t timestampOfLastMessage;
 
-    std::shared_ptr<WebsocketService> websocketESP;
-    std::vector<Flower> vectorOfFlowers;
 
     ESP_unit();
     ~ESP_unit();
@@ -135,8 +142,7 @@ public:
     uint8_t create_record_in_database() override;
     void update_values() override;
 
-    bool check_message_appearance();
-    void validate_incoming_messages();
+
     void get_values_from_json(std::vector<std::string> parameters, std::vector<std::string> *containerForValues);
     void get_all_flowers_from_database();
     void assign_values_to_vector_flowers(vector<string> &data);
@@ -144,6 +150,31 @@ public:
 
     int8_t receive_new_measurment();
     void manage_the_flower_measurments();
+
+};
+
+class ESP{
+
+private:
+    uint16_t ID_esp;
+
+
+public:
+
+    ESP();
+    ~ESP();
+
+
+    std::string name;
+    time_t timestampOfLastMessage;
+
+    std::shared_ptr<WebsocketService> websocketESP;
+    std::vector<FlowerEntity> vectorOfFlowers;
+
+
+    bool check_message_appearance();
+    void validate_incoming_messages();
+        
 
 };
 

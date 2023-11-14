@@ -5,18 +5,6 @@
 #include "WebsocketService.h"
 #include "Record.h"
 
-static void on_close(beast::error_code ec)
-{
-//    if(ec)
-//        return fail(ec, "close");
-//
-//    // If we get here then the connection is closed gracefully
-//
-//    // The make_printable() function helps print a ConstBufferSequence
-//    std::cout << beast::make_printable(buffer_.data()) << std::endl;
-}
-
-
 
 WebsocketService::WebsocketService(tcp::socket&& socket) : ws(std::move(socket)) {
 
