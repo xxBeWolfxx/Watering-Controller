@@ -11,11 +11,13 @@ ListenerWebsocket::ListenerWebsocket(net::io_context &ioc, std::string ipAddress
 void ListenerWebsocket::asyncAccpet() {
     acceptor.async_accept(ioc, [self{shared_from_this()}](boost::system::error_code ec, tcp::socket socket){
         std::string ipAddress = socket.remote_endpoint().address().to_string();
-        std::shared_ptr<ESP_unit> newUnit = std::make_shared<ESP_unit>();
+        std::shared_ptr<ESP> newUnit = std::make_shared<ESP>();
+
 
         newUnit->websocketESP = std::make_shared<WebsocketService>(std::move(socket));
         newUnit->websocketESP->assignClientIP(ipAddress);
         newUnit->websocketESP->process();
+        newUnit->get_ESP_database();
 
         self->ptrVector->push_back(std::move(newUnit));
 
@@ -32,7 +34,7 @@ void ListenerWebsocket::delete_all_not_working_ESP() const {
     bool itemFound = false;
     uint8_t iterator = 0;
     for ( auto &ptr : *this->ptrVector){
-        ESP_unit *esp = ptr.get();
+        ESP *esp = ptr.get();
         WebsocketService *item = esp->websocketESP.get();
 
         if(!item->getState()){
@@ -54,6 +56,6 @@ void ListenerWebsocket::delete_all_not_working_ESP() const {
 
 }
 
-void ListenerWebsocket::assignVectorWebsocket(std::vector<std::shared_ptr<ESP_unit>> &ptr) {
+void ListenerWebsocket::assignVectorWebsocket(std::vector<std::shared_ptr<ESP>> &ptr) {
     this->ptrVector = &ptr;
 }

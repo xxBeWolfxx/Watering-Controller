@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(updateESP){
     database.OpenDatabase("rpi.db");
     Record::database = &database;
 
-    ESP_unit esp = ESP_unit();
+    ESP esp = ESP();
     std::vector<std::string> data;
 
 

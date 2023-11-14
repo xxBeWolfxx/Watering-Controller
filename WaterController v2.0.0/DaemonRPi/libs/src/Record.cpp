@@ -30,75 +30,88 @@ std::vector<std::string> Record::split_record_to_seprate_values(std::string reco
     return output;
 }
 
-
-ESP_unit::ESP_unit() : Record() {
+ESP::ESP(){
     this->status = ESP_STATUS::INIT;
-    this->timestampOfLastMessage = std::time(0);
 }
 
-ESP_unit::~ESP_unit() {
-//    this->websocketESP.reset();
-//   std::cout << "ESP DEL" << std::endl;
+ESP::~ESP(){
+    
 }
 
+int8_t ESP::receive_new_measurment() {
 
-uint8_t ESP_unit::get_record(vector<string> &data) {
-    string *comand = new string;
-    *comand = "SELECT * FROM ESP WHERE id=" + to_string(this->ID);
-    this->database->SelectData(comand, data);
-    delete comand;
+    std::vector<std::string> parameters = { "CODE" };
+    std::vector<std::string> values;
+    Measurement *handleMeasurment;
+    Flower *handleFlower;
 
-    if(data.empty()){
-        return 0;
+    this->get_values_from_json(parameters, &values);
+    if (values.empty()) return -1;
+
+    uint16_t typeCase = (uint16_t) std::stoi(values[0]);
+    values.clear();
+    parameters.clear();
+
+    parameters = { "HUM", "TEMP", "ISO" };
+    this->get_values_from_json(parameters, &values);
+    if(values.size() < 3) return -1;
+
+
+    switch(typeCase){
+        case 101:{
+            handleFlower = &this->espDatabase.vectorOfFlowers[0];
+            break;
+        }
+        case 102:{
+            handleFlower = &this->espDatabase.vectorOfFlowers[1];
+            break;
+        }
+        default:{
+            break;
+        }
+
     }
 
+    handleMeasurment = &handleFlower->measurementOfFlower;
+    handleMeasurment->vecOfHumidity.push_back(std::stoi(values[0]));
+    handleMeasurment->vecOfTemperature.push_back(std::stof(values[1]));
+    handleMeasurment->vecOfInsolation.push_back(std::stoi(values[2]));
 
-    return 1;
+    handleFlower->set_flag_data(true);
+
+    return 0;
+
+
 
 }
 
-uint8_t ESP_unit::create_record_in_database() {
+void ESP::create_log(std::string type) {
     string *values = new string;
     string *columns = new string;
     string *table = new string;
 
-    *values = to_string(this->ID) + ",'" + this->websocketESP->getIPaddress() + "','" + this->name + "'," + to_string(this->timestampOfLastMessage);
-    *columns = "ID, IP_ADDRESS, NAME, TIMESTAMP_LAST_MSG";
-    *table = "ESP";
+    *values = "'" + this->name + "','" + this->websocketESP->getIPaddress()
+            + "'," + to_string(this->espDatabase.get_last_timestamp())
+            + ",'" + type + "'" ; //add timestamp do websocketa
+    *columns = "ESP_NAME, ESP_IP, TIMESTAMP, TYPE";
+    *table = "LOGESP";
 
-
-    this->database->InsertData(table, columns, values);
+    this->espDatabase.database->InsertData(table, columns, values);
 
     delete values;
     delete columns;
     delete table;
 
-}
-
-void ESP_unit::update_values() {
-    string *command = new string;
-    string *condition = new string;
-
-
-    *condition = " WHERE ID=" + std::to_string(this->ID);
-
-    *command = "UPDATE ESP SET IP_ADDRESS='" + this->websocketESP->getIPaddress()
-            + "',NAME='" + this->name + "',TIMESTAMP_LAST_MSG=" + std::to_string(this->timestampOfLastMessage) + *condition;
-
-    this->database->ExecCommand(command);
-
-    delete command;
-    delete condition;
-
-
 
 }
 
-bool ESP_unit::check_message_appearance() {
+
+
+bool ESP::check_message_appearance() {
     return this->websocketESP->new_message_appeared;
 }
 
-void ESP_unit::validate_incoming_messages() {
+void ESP::validate_incoming_messages() {
 
     switch(this->status){
 
@@ -116,12 +129,13 @@ void ESP_unit::validate_incoming_messages() {
 
             }
 
+            this->espDatabase.assign_id_name(this->name, this->ID);
             this->status = ESP_STATUS::CHECKING_DATABASE;
             break;
         }
         case CHECKING_DATABASE: {
             std::vector<std::string> data;
-            this->get_record(data);
+            this->espDatabase.get_record(data);
 
             if(data.empty()){
                 this->status = ESP_STATUS::MISSING_ELEMENT;
@@ -139,7 +153,7 @@ void ESP_unit::validate_incoming_messages() {
         }
 
         case IN_DATABASE: {
-            this->get_all_flowers_from_database();
+            this->espDatabase.get_all_flowers_from_database();
             this->status = ESP_STATUS::WORKING;
             break;
         }
@@ -183,7 +197,88 @@ void ESP_unit::validate_incoming_messages() {
 
 }
 
-void ESP_unit::get_values_from_json(std::vector<std::string> parameters, std::vector<std::string> *containerForValues) {
+void ESP::get_ESP_database(){
+
+    this->espDatabase = ESP_Entity(this->websocketESP->getIPaddress());
+
+}
+
+
+
+ESP_Entity::ESP_Entity(std::string ipAddress) : Record() {
+    this->timestampOfLastMessage = std::time(0);
+    this->ipAddress = ipAddress;
+}
+
+ESP_Entity::ESP_Entity() {
+
+}
+
+ESP_Entity::~ESP_Entity() {
+//    this->websocketESP.reset();
+//   std::cout << "ESP DEL" << std::endl;
+}
+
+void ESP_Entity::assign_id_name(std::string name, uint16_t id){
+    this->ID = id;
+    this->name = name;
+}
+
+
+uint8_t ESP_Entity::get_record(vector<string> &data) {
+    string *comand = new string;
+    *comand = "SELECT * FROM ESP WHERE id=" + to_string(this->ID);
+    this->database->SelectData(comand, data);
+    delete comand;
+
+    if(data.empty()){
+        return 0;
+    }
+
+
+    return 1;
+
+}
+
+uint8_t ESP_Entity::create_record_in_database() {
+    string *values = new string;
+    string *columns = new string;
+    string *table = new string;
+
+    *values = to_string(this->ID) + ",'" + this->ipAddress + "','" + this->name + "'," + to_string(this->timestampOfLastMessage);
+    *columns = "ID, IP_ADDRESS, NAME, TIMESTAMP_LAST_MSG";
+    *table = "ESP";
+
+
+    this->database->InsertData(table, columns, values);
+
+    delete values;
+    delete columns;
+    delete table;
+
+}
+
+void ESP_Entity::update_values() {
+    string *command = new string;
+    string *condition = new string;
+
+
+    *condition = " WHERE ID=" + std::to_string(this->ID);
+
+    *command = "UPDATE ESP SET IP_ADDRESS='" + this->ipAddress
+            + "',NAME='" + this->name + "',TIMESTAMP_LAST_MSG=" + std::to_string(this->timestampOfLastMessage) + *condition;
+
+    this->database->ExecCommand(command);
+
+    delete command;
+    delete condition;
+
+
+
+}
+
+
+void ESP::get_values_from_json(std::vector<std::string> parameters, std::vector<std::string> *containerForValues) {
     std::stringstream message;
     message.str(this->websocketESP->getContent());
     boost::property_tree::ptree pt;
@@ -199,7 +294,7 @@ void ESP_unit::get_values_from_json(std::vector<std::string> parameters, std::ve
 
 }
 
-void ESP_unit::get_all_flowers_from_database() {
+void ESP_Entity::get_all_flowers_from_database() {
     Flower tempFlower = Flower(this->ID);
     std::vector<std::string> data;
 
@@ -218,7 +313,7 @@ void ESP_unit::get_all_flowers_from_database() {
 
 }
 
-void ESP_unit::assign_values_to_vector_flowers(vector<string> &data) {
+void ESP_Entity::assign_values_to_vector_flowers(vector<string> &data) {
 
     for ( std::string &item : data){
         Flower tempFlower = Flower(this->ID);
@@ -237,73 +332,9 @@ void ESP_unit::assign_values_to_vector_flowers(vector<string> &data) {
 
 }
 
-int8_t ESP_unit::receive_new_measurment() {
-
-    std::vector<std::string> parameters = { "CODE" };
-    std::vector<std::string> values;
-    Measurement *handleMeasurment;
-    Flower *handleFlower;
-
-    this->get_values_from_json(parameters, &values);
-    if (values.empty()) return -1;
-
-    uint16_t typeCase = (uint16_t) std::stoi(values[0]);
-    values.clear();
-    parameters.clear();
-
-    parameters = { "HUM", "TEMP", "ISO" };
-    this->get_values_from_json(parameters, &values);
-    if(values.size() < 3) return -1;
-
-
-    switch(typeCase){
-        case 101:{
-            handleFlower = &this->vectorOfFlowers[0];
-            break;
-        }
-        case 102:{
-            handleFlower = &this->vectorOfFlowers[1];
-            break;
-        }
-        default:{
-            break;
-        }
-
-    }
-
-    handleMeasurment = &handleFlower->measurementOfFlower;
-    handleMeasurment->vecOfHumidity.push_back(std::stoi(values[0]));
-    handleMeasurment->vecOfTemperature.push_back(std::stof(values[1]));
-    handleMeasurment->vecOfInsolation.push_back(std::stoi(values[2]));
-
-    handleFlower->set_flag_data(true);
-
-    return 0;
-
-
-
+time_t ESP_Entity::get_last_timestamp(){
+    return this->timestampOfLastMessage;
 }
-
-void ESP_unit::create_log(std::string type) {
-    string *values = new string;
-    string *columns = new string;
-    string *table = new string;
-
-    *values = "'" + this->name + "','" + this->websocketESP->getIPaddress()
-            + "'," + to_string(this->timestampOfLastMessage)
-            + ",'" + type + "'" ; //add timestamp do websocketa
-    *columns = "ESP_NAME, ESP_IP, TIMESTAMP, TYPE";
-    *table = "LOGESP";
-
-    this->database->InsertData(table, columns, values);
-
-    delete values;
-    delete columns;
-    delete table;
-
-
-}
-
 
 Flower::Flower()  {
 

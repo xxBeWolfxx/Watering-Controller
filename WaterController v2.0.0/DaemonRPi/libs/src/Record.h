@@ -116,30 +116,55 @@ public:
 
 };
 
-class ESP_unit : public Record{
+
+class ESP_Entity : public Record{
 private:
-    ESP_STATUS status;
-
-
-public:
+    std::string ipAddress;
     std::string name;
     time_t timestampOfLastMessage;
 
-    std::shared_ptr<WebsocketService> websocketESP;
+public:
+
     std::vector<Flower> vectorOfFlowers;
 
-    ESP_unit();
-    ~ESP_unit();
+    ESP_Entity(std::string ipAddress);
+    ESP_Entity();
+    ~ESP_Entity();
+
 
     uint8_t get_record(vector<string> &data) override;
     uint8_t create_record_in_database() override;
     void update_values() override;
 
+    void assign_id_name(std::string name, uint16_t id);
+    void get_all_flowers_from_database();
+    void assign_values_to_vector_flowers(vector<string> &data);
+    time_t get_last_timestamp();
+
+};
+
+
+class ESP {
+private:
+    ESP_STATUS status;
+    uint16_t ID;
+
+
+public:
+    std::string name;
+    std::shared_ptr<WebsocketService> websocketESP;
+    ESP_Entity espDatabase;
+
+    ESP();
+    ~ESP();
+
+
+    void get_ESP_database();
     bool check_message_appearance();
     void validate_incoming_messages();
     void get_values_from_json(std::vector<std::string> parameters, std::vector<std::string> *containerForValues);
-    void get_all_flowers_from_database();
-    void assign_values_to_vector_flowers(vector<string> &data);
+    
+    
     void create_log(std::string type);
 
     int8_t receive_new_measurment();

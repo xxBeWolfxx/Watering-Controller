@@ -36,7 +36,7 @@ int main() {
 
 //    database.Select_all_data("PLANT", data);
 
-    vector<shared_ptr<ESP_unit>> vecESP;
+    vector<shared_ptr<ESP>> vecESP;
     listiener->assignVectorWebsocket(vecESP);
     Record::database = &database;
 
@@ -69,7 +69,7 @@ int main() {
                     if (item->check_message_appearance()){
                         item->validate_incoming_messages();
                     }
-                    for( Flower &itemFlower : item->vectorOfFlowers){
+                    for( Flower &itemFlower : item->espDatabase.vectorOfFlowers){
                         if(itemFlower.get_status_new_data()){
                             itemFlower.update_measurement_in_database();
                             itemFlower.set_flag_data(false);
@@ -85,7 +85,7 @@ int main() {
 
             case Configuration::CHECK_MEASURMENTS:{
                 for(auto &item : vecESP){
-                    for (auto &tempFlower : item->vectorOfFlowers){
+                    for (auto &tempFlower : item->espDatabase.vectorOfFlowers){
                         if (tempFlower.get_status_new_data()){
                             tempFlower.check_quantity_of_measurments();
                             tempFlower.update_measurement_in_database();
