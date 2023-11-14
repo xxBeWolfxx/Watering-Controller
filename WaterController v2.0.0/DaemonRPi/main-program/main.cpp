@@ -63,12 +63,13 @@ int main() {
 
             case Configuration::VALIDATION_INCOMING_MSG:{
                 listiener->delete_all_not_working_ESP();
+                vector<string> temp;
 
                 for(auto &item : vecESP){
                     if (item->check_message_appearance()){
                         item->validate_incoming_messages();
                     }
-                    for(FlowerEntity &itemFlower : item->vectorOfFlowers){
+                    for( Flower &itemFlower : item->vectorOfFlowers){
                         if(itemFlower.get_status_new_data()){
                             itemFlower.update_measurement_in_database();
                             itemFlower.set_flag_data(false);
@@ -91,6 +92,12 @@ int main() {
                         }
                     }
                 }
+                /*
+                 * CALCULATE AVG
+                 * SAVE TO DATABASE
+                 *
+                 */
+
 
                 status = Configuration::VALIDATION_INCOMING_MSG;
 

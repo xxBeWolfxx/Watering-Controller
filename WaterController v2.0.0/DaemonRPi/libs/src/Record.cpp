@@ -200,13 +200,13 @@ void ESP_unit::get_values_from_json(std::vector<std::string> parameters, std::ve
 }
 
 void ESP_unit::get_all_flowers_from_database() {
-    FlowerEntity tempFlower = FlowerEntity(this->ID);
+    Flower tempFlower = Flower(this->ID);
     std::vector<std::string> data;
 
     tempFlower.get_all_record_with_id_esp(data);
     this->assign_values_to_vector_flowers(data);
 
-    for (FlowerEntity &item : this->vectorOfFlowers){
+    for (Flower &item : this->vectorOfFlowers){
         item.get_measurement_from_database();
 
     }
@@ -221,7 +221,7 @@ void ESP_unit::get_all_flowers_from_database() {
 void ESP_unit::assign_values_to_vector_flowers(vector<string> &data) {
 
     for ( std::string &item : data){
-        FlowerEntity tempFlower = FlowerEntity(this->ID);
+        Flower tempFlower = Flower(this->ID);
         auto values = tempFlower.split_record_to_seprate_values(item, '/');
         tempFlower.set_ID( (uint16_t) stoi(values[0]) );
         tempFlower.namePlant = values[2];
@@ -242,7 +242,7 @@ int8_t ESP_unit::receive_new_measurment() {
     std::vector<std::string> parameters = { "CODE" };
     std::vector<std::string> values;
     Measurement *handleMeasurment;
-    FlowerEntity *handleFlower;
+    Flower *handleFlower;
 
     this->get_values_from_json(parameters, &values);
     if (values.empty()) return -1;
@@ -289,7 +289,7 @@ void ESP_unit::create_log(std::string type) {
     string *columns = new string;
     string *table = new string;
 
-    *values = "'" + this->name + "','" + this->ipAddress
+    *values = "'" + this->name + "','" + this->websocketESP->getIPaddress()
             + "'," + to_string(this->timestampOfLastMessage)
             + ",'" + type + "'" ; //add timestamp do websocketa
     *columns = "ESP_NAME, ESP_IP, TIMESTAMP, TYPE";
@@ -305,15 +305,15 @@ void ESP_unit::create_log(std::string type) {
 }
 
 
-FlowerEntity::FlowerEntity()  {
+Flower::Flower()  {
 
 }
 
-FlowerEntity::~FlowerEntity() {
+Flower::~Flower() {
 
 }
 
-uint8_t FlowerEntity::get_record(vector<string> &data) {
+uint8_t Flower::get_record(vector<string> &data) {
     string *comand = new string;
     *comand = "SELECT * FROM PLANT WHERE id=" + to_string(this->ID);
     this->database->SelectData(comand, data);
@@ -327,7 +327,7 @@ uint8_t FlowerEntity::get_record(vector<string> &data) {
     return 1;
 }
 
-uint8_t FlowerEntity::get_all_record_with_id_esp(vector<string> &data) const {
+uint8_t Flower::get_all_record_with_id_esp(vector<string> &data) const {
     string *comand = new string;
     *comand = "SELECT * FROM PLANT WHERE ID_ESP=" + to_string(this->espID);
     this->database->SelectData(comand, data);
@@ -339,7 +339,7 @@ uint8_t FlowerEntity::get_all_record_with_id_esp(vector<string> &data) const {
     return 0;
 }
 
-void FlowerEntity::update_values() {
+void Flower::update_values() {
 
     string *command = new string;
     string *condition = new string;
@@ -364,7 +364,7 @@ void FlowerEntity::update_values() {
 
 }
 
-void FlowerEntity::get_recipe(std::string input) {
+void Flower::get_recipe(std::string input) {
     input = input.substr(1, input.size() - 2);
 
     std::vector<std::string> output = this->split_record_to_seprate_values(input, ',');
@@ -378,7 +378,7 @@ void FlowerEntity::get_recipe(std::string input) {
 
 }
 
-uint8_t FlowerEntity::create_record_in_database() {
+uint8_t Flower::create_record_in_database() {
     string *values = new string;
     string *columns = new string;
     string *table = new string;
@@ -405,7 +405,7 @@ uint8_t FlowerEntity::create_record_in_database() {
 }
 
 template<typename T>
-float FlowerEntity::calculate_average(const vector<T> &vec) {
+float Flower::calculate_average(const vector<T> &vec) {
     uint8_t size = vec.size();
     float addition = 0;
 
@@ -419,7 +419,7 @@ float FlowerEntity::calculate_average(const vector<T> &vec) {
     return 0;
 }
 
-void FlowerEntity::calculate_all_averages() {
+void Flower::calculate_all_averages() {
 
     this->measurementOfFlower.avgHumidity = (uint8_t) this->calculate_average(this->measurementOfFlower.vecOfHumidity);
     this->measurementOfFlower.avgInsolation = (uint8_t) this->calculate_average(this->measurementOfFlower.vecOfInsolation);
@@ -427,7 +427,7 @@ void FlowerEntity::calculate_all_averages() {
 
 }
 
-void FlowerEntity::create_measurement_in_database() {
+void Flower::create_measurement_in_database() {
     this->calculate_all_averages();
     std::string temperature = this->make_vector_of_measurement(this->measurementOfFlower.vecOfTemperature);
     std::string humidity = this->make_vector_of_measurement(this->measurementOfFlower.vecOfHumidity);
@@ -454,7 +454,7 @@ void FlowerEntity::create_measurement_in_database() {
 
 }
 
-void FlowerEntity::update_measurement_in_database() {
+void Flower::update_measurement_in_database() {
 
     string *command = new string;
     string *condition = new string;
@@ -483,12 +483,12 @@ void FlowerEntity::update_measurement_in_database() {
 
 }
 
-void FlowerEntity::set_ID(uint16_t id) {
+void Flower::set_ID(uint16_t id) {
     this->ID = id;
 
 }
 
-void FlowerEntity::get_measurement_from_database() {
+void Flower::get_measurement_from_database() {
     std::vector<std::string> data;
     string *comand = new string;
 
@@ -513,15 +513,15 @@ void FlowerEntity::get_measurement_from_database() {
 
 }
 
-bool FlowerEntity::get_status_new_data() {
+bool Flower::get_status_new_data() {
     return this->newData;
 }
 
-void FlowerEntity::set_flag_data(bool flag){
+void Flower::set_flag_data(bool flag){
     this->newData = flag;
 }
 
-void FlowerEntity::check_quantity_of_measurments() {
+void Flower::check_quantity_of_measurments() {
     if (this->measurementOfFlower.vecOfInsolation.size() > (this->limitOfMeasuments - 1)) {
         this->measurementOfFlower.avgInsolation = this->calculate_average(this->measurementOfFlower.vecOfInsolation);
         this->measurementOfFlower.clearMeasurmentVector(this->measurementOfFlower.vecOfInsolation,
@@ -542,7 +542,7 @@ void FlowerEntity::check_quantity_of_measurments() {
 }
 
 template<typename T>
-std::vector<T> FlowerEntity::read_vector_from_database(std::string &str, bool ifInt) {
+std::vector<T> Flower::read_vector_from_database(std::string &str, bool ifInt) {
     str = str.substr(1, str.size() - 2);
     std::vector<std::string> vec = this->split_record_to_seprate_values(str, ',');
 
@@ -562,7 +562,7 @@ std::vector<T> FlowerEntity::read_vector_from_database(std::string &str, bool if
 
 
 template<typename T>
-std::string FlowerEntity::make_vector_of_measurement(const vector<T> &vec) {
+std::string Flower::make_vector_of_measurement(const vector<T> &vec) {
     std::string output = "[";
 
     for (auto &item : vec){
